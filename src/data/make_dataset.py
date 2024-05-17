@@ -4,6 +4,25 @@ import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 
+import os
+from kaggle.api.kaggle_api_extended import KaggleApi
+import pandas as pd
+
+def donwload_dataset():
+    dataset_folder = Path("data/raw")
+    # log into kaggle
+    api = KaggleApi()
+    api.authenticate()
+    
+    # if the folder does not exist, create it
+    if not dataset_folder.exists():
+        dataset_folder.mkdir(parents=True)
+    
+    # download the dataset if not already downlaoded
+    if not (dataset_folder / 'zeroshot-llm4ts-benchmark').exists():
+        api.dataset_download_files('vittoriorossi/zeroshot-llm4ts-benchmark', 
+                               path=dataset_folder, 
+                               unzip=True)
 
 @click.command()
 @click.argument('input_filepath', type=click.Path(exists=True))
@@ -13,7 +32,12 @@ def main(input_filepath, output_filepath):
         cleaned data ready to be analyzed (saved in ../processed).
     """
     logger = logging.getLogger(__name__)
-    logger.info('making final data set from raw data')
+
+    logger.info('Downloading dataset')
+    donwload_dataset()
+    logger.info('Dataset downloaded')
+
+    
 
 
 if __name__ == '__main__':
