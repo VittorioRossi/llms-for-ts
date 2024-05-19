@@ -1,15 +1,15 @@
-# -*- coding: utf-8 -*-
 import click
 import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 
-import os
 from kaggle.api.kaggle_api_extended import KaggleApi
 import pandas as pd
 
-def donwload_dataset():
-    dataset_folder = Path("data/raw")
+def download_dataset(dataset_folder = "data/raw"):
+    
+    if isinstance(dataset_folder, str):
+        dataset_folder = Path(dataset_folder)
     # log into kaggle
     api = KaggleApi()
     api.authenticate()
@@ -23,21 +23,23 @@ def donwload_dataset():
         api.dataset_download_files('vittoriorossi/zeroshot-llm4ts-benchmark', 
                                path=dataset_folder, 
                                unzip=True)
+    return dataset_folder / 'zeroshot-llm4ts-benchmark'
 
 @click.command()
-@click.argument('input_filepath', type=click.Path(exists=True))
-@click.argument('output_filepath', type=click.Path())
+@click.argument('input_filepath', type=click.Path(exists=True), default="data/raw")
+@click.argument('output_filepath', type=click.Path(), default="data/processed")
 def main(input_filepath, output_filepath):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
     logger = logging.getLogger(__name__)
 
-    logger.info('Downloading dataset')
-    donwload_dataset()
-    logger.info('Dataset downloaded')
+    input_filepath = Path(input_filepath)
+    output_filepath = Path(output_filepath)
 
-    
+    logger.info('Downloading dataset')
+    raw_dataset_folder = download_dataset(input_filepath)
+    logger.info('Dataset downloaded')
 
 
 if __name__ == '__main__':
