@@ -31,8 +31,7 @@ def process_dataset(dataset: pd.DataFrame,
                     window_size:int, 
                     target_size: int,
                     row_wise:bool = False,
-                    target:str = ''
-                    ) -> pd.DataFrame:
+                    target:str = '') -> pd.DataFrame:
     """
     This function takes in a dataset, a prompt name, window size, target size, and optional parameters
     and returns a processed dataset ready to be passed to the model.
