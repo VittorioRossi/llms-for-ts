@@ -21,8 +21,9 @@ def _create_observation_row_wise(df: pd.DataFrame, window_size: int = 24, target
         _x, _y = _create_observation(row, window_size, target_size)
         X.append(_x)
         y.append(_y)
-    X = np.array(X)
-    y = np.array(y)
+
+    X = np.array(X).reshape(-1, window_size)
+    y = np.array(y).flatten()
     return X, y
         
 
@@ -64,6 +65,5 @@ def process_dataset(dataset: pd.DataFrame,
     
     # process the dataset
     processed_X = [prompt.render(data=x) for x in X]
-    
 
     return pd.DataFrame({"X": processed_X, "y": y})
