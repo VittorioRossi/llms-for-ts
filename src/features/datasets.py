@@ -15,14 +15,25 @@ class M4Dataset(Dataset):
     """
     M4Dataset is a dataset class that takes in a path to the M4 dataset and processes it.
     """
-    def __init__(self, path:str = '/data/raw/m4', train = True):
+    def __init__(self, path:str = '/data/raw/m4', train = True, **kwargs):
         self.path = path
         self.df_path = f'{self.path}/' + ('train.csv' if train else 'test.csv')
+
     
     def process(self, promt_name:str, chunksize = 1000, **kwargs):
         chunks = pd.read_csv(self.df_path, chunksize=chunksize)
+
+        config = {
+            'target': 'target',
+            'target_size': kwargs.get('target_size', 1),
+            'window_size': kwargs.get('window_size', 24),
+            'ts_features': [],
+            'metadata': ["V1"],
+        }
+
         for chunk in chunks:
-            yield process_dataset(chunk, promt_name, **kwargs)
+            chunk = chunk.melt(id_vars=['V1'], var_name='d', value_name='target')
+            yield process_dataset(chunk, promt_name, **config)
     
 
 class M5Dataset(Dataset):

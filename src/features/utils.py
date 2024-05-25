@@ -71,7 +71,7 @@ class Observation(BaseModel):
             Tuple[str, np.ndarray]: The rendered observation.
         """
         return prompt.render(data=self.X, metadata=self.metadata), self.y
-
+ 
 def _create_observations_w_ft_and_meta(df: pd.DataFrame, target: str, ts_features: List[str], metadata:List[str], window_size: int = 24, target_size: int = 1) -> List[Observation]:
     """
     Create an observation object with time series features.
@@ -120,14 +120,6 @@ def process_dataset(dataset: pd.DataFrame,
     # load the prompt
     prompt: Template = load_template(prompt_name)
 
-    """
-    X, y = None, None
-
-    if row_wise:
-        X, y = _create_observations_row_wise(dataset, window_size, target_size)
-    else:
-        X, y = _create_observations(dataset[target], window_size, target_size)
-    """
     obs = None
     if metadata:
         assert isinstance(metadata, list), "metadata must be a list of strings"
