@@ -121,7 +121,7 @@ def process_dataset(dataset: pd.DataFrame,
     prompt: Template = load_template(prompt_name)
 
     obs = None
-    if metadata:
+    if len(metadata) != 0:
         assert isinstance(metadata, list), "metadata must be a list of strings"
         assert all([meta in dataset.columns for meta in metadata]), "metadata must be a list of columns in the dataset"
         obs = []
@@ -143,5 +143,5 @@ def process_dataset(dataset: pd.DataFrame,
     # metadata must be a list of strings that represents the column containing the metadata
     # and the name of that metadata in the prompt
     # metadata = ['Page']
-    
+    print(obs)
     return [ob.render(prompt) for ob in obs]

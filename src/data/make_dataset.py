@@ -2,9 +2,11 @@ import click
 import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
+import os 
 
 from kaggle.api.kaggle_api_extended import KaggleApi
-import pandas as pd
+import json
+import shutil
 
 def download_dataset(dataset_folder = "data/raw"):
     
@@ -18,11 +20,32 @@ def download_dataset(dataset_folder = "data/raw"):
     if not dataset_folder.exists():
         dataset_folder.mkdir(parents=True)
     
+    dataset_ref = 'vittoriorossi/zeroshot-llm4ts-benchmark'
+    
     # download the dataset if not already downlaoded
     if not (dataset_folder / 'zeroshot-llm4ts-benchmark').exists():
-        api.dataset_download_files('vittoriorossi/zeroshot-llm4ts-benchmark', 
+        api.dataset_download_files(dataset_ref, 
                                path=dataset_folder, 
                                unzip=True)
+    else: 
+        # check when it was downloaded
+        last_downloaded = os.path.getmtime(dataset_folder / 'zeroshot-llm4ts-benchmark')
+
+        # check if the dataset is updated
+        metadata = json.loads(api.dataset_metadata(dataset_ref))
+        last_updated = metadata['lastUpdated']
+        
+        if last_downloaded < last_updated:
+            # clean the dataset_folder
+            print(f"Dataset {dataset_ref} has been updated. Downloading the new version")
+            shutil.rmtree(dataset_folder)
+            dataset_folder.mkdir(parents=True)
+            api.dataset_download_files(dataset_ref, 
+                               path=dataset_folder, 
+                               unzip=True,
+                               force=True)
+
+
     return dataset_folder / 'zeroshot-llm4ts-benchmark'
 
 @click.command()
