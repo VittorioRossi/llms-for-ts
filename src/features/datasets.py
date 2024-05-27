@@ -2,14 +2,35 @@ from abc import ABC, abstractmethod
 import pandas as pd
 import numpy as np
 
-from src.features.utils import process_dataset
-
+from features.utils import process_dataset
 
 class Dataset(ABC):
     @abstractmethod
     def process(self):
         pass
 
+class CTDataset(Dataset):
+    def __init__(self, path:str = '/data/raw/CT'):
+        self.path = path
+
+    def process(self, **kwargs):
+        X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines('\n')
+        y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines('\n')
+        
+        for obs in [(xi, yi) for xi, yi in zip(X, y)]:
+            yield obs
+
+
+class SGFDataset(Dataset):
+    def __init__(self, path:str = '/data/raw/SG'):
+        self.path = path
+
+    def process(self, **kwargs):
+        X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines('\n')
+        y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines('\n')
+        
+        for obs in [(xi, yi) for xi, yi in zip(X, y)]:
+            yield obs
 
 class ETTHDataset(Dataset):
     """
@@ -18,7 +39,7 @@ class ETTHDataset(Dataset):
     def __init__(self, path:str = '/data/raw/etth'):
         self.path = path
     
-    def process(self, promt_name:str, chunksize = 1000, **kwargs):
+    def process(self, promt_name:str, **kwargs):
         df = pd.read_csv(self.path)
         config = {
             'target': 'target',
@@ -28,7 +49,9 @@ class ETTHDataset(Dataset):
             'metadata': kwargs.get('metadata', []),
         }
         df = df.rename(columns={'OT': 'target'})
-        return process_dataset(df, promt_name, **config)
+        generator = process_dataset(df, promt_name, **config)
+        for observation in generator:
+            yield observation
 
 class M4Dataset(Dataset):
     """
@@ -52,7 +75,9 @@ class M4Dataset(Dataset):
 
         for chunk in chunks:
             chunk = chunk.melt(id_vars=['V1'], var_name='d', value_name='target')
-            yield process_dataset(chunk, promt_name, **config)
+            generator = process_dataset(chunk, promt_name, **config)
+            for observation in generator:
+                yield observation
     
 
 
@@ -104,7 +129,9 @@ class M5Dataset(Dataset):
         for chunk in chunks:
             chunk = chunk.melt(id_vars=metadata, var_name='d', value_name='target')
             chunk = self._merge_metadata(chunk)
-            yield process_dataset(chunk, promt_name, **kwargs)
+            generator = process_dataset(chunk, promt_name, **config)
+            for observation in generator:
+                yield observation
 
 class GWTDataset(Dataset):
     """
@@ -125,7 +152,9 @@ class GWTDataset(Dataset):
         }
         for chunk in chunks:
             chunk = chunk.melt(id_vars=['Page'], var_name='d', value_name='target')
-            yield process_dataset(chunk, promt_name, **config)
+            generator = process_dataset(chunk, promt_name, **config)
+            for observation in generator:
+                yield observation
 
 class PEMSDataset(Dataset):
     def __init__(self, path='data/raw/PEMS4') -> None:

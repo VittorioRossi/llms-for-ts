@@ -5,7 +5,7 @@ import numpy as np
 from pydantic import BaseModel 
 from typing import List, Tuple
 
-from src.prompt.utils import load_template
+from prompt.utils import load_template
 
 class Observation(BaseModel):
     """
@@ -58,7 +58,15 @@ class Observation(BaseModel):
             list: The keys of the metadata.
         """
         return self.metadata.keys()
-    
+
+    def as_tuple(self):
+        """
+        Returns the observation as a tuple.
+
+        Returns:
+            Tuple: The observation as a tuple.
+        """
+        return (self.X, self.y)
 
     def render(self, prompt:Template) -> Tuple[str, np.ndarray]:
         """
@@ -101,7 +109,7 @@ def process_dataset(dataset: pd.DataFrame,
                     ts_features: List[str] = [],
                     metadata: List[str] = [],
                     *args,
-                    **kwargs) -> pd.DataFrame:
+                    **kwargs) -> List[Tuple[str, np.ndarray]]:
     """
     This function takes in a dataset, a prompt name, window size, target size, and optional parameters
     and returns a processed dataset ready to be passed to the model.
