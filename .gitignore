@@ -24,10 +24,10 @@ var/
 .installed.cfg
 *.egg
 
-data/raw/*
-data/processed/*
-data/interim/*
-data/external/*
+data/raw/*/
+data/processed/*/
+data/interim/*/
+data/external/*/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
