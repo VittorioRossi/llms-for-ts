@@ -10,10 +10,10 @@ class Dataset(ABC):
         pass
 
 class CTDataset(Dataset):
-    def __init__(self, promt_name, path:str = '/data/raw/CT'):
+    def __init__(self, path:str = '/data/raw/CT'):
         self.path = path
 
-    def process(self, **kwargs):
+    def process(self, promt_name, **kwargs):
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines('\n')
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines('\n')
         
@@ -22,10 +22,10 @@ class CTDataset(Dataset):
 
 
 class SGFDataset(Dataset):
-    def __init__(self, promt_name, path:str = '/data/raw/SG'):
+    def __init__(self, path:str = '/data/raw/SG'):
         self.path = path
 
-    def process(self, **kwargs):
+    def process(self, promt_name, **kwargs):
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines('\n')
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines('\n')
         
