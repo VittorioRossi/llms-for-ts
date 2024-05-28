@@ -1,79 +1,50 @@
-from transformers import pipeline, set_seed
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import pipeline, set_seed, AutoModelForCausalLM, AutoTokenizer
 from abc import ABC, abstractmethod
-from requests import Request
 import os
-
 class LLM(ABC):
     @abstractmethod
     def __init__(self):
         pass
 
     @abstractmethod
-    def generate(self, prompt:str) -> str:
+    def generate(self, prompt: str) -> str:
         pass
 
-class GeminiLLM(LLM):
-    def __init__(self, model_name:str = "gemini-1.5-flash", generation_config:dict = {}):
-        try :
-            import os
-            import google.generativeai as genai
-        except:
-            raise ImportError("Please install the google-generativeai package to use the Gemini model")
-
-        genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-
-        generation_config = {
-            "temperature": generation_config.get("temperature", 1),
-            "top_p": generation_config.get("top_p", 0.95),
-            "top_k": generation_config.get("top_k", 50),
-            "max_output_tokens": generation_config.get("max_output_tokens", 100),
-            "response_mime_type": "text/plain",
-        }
-
-        self.model = genai.GenerativeModel(
-            model_name=model_name,
-            generation_config=generation_config,
-        )
-
-
-    def generate(self, prompt:str) -> str:
-        chat_session = self.model.start_chat(
-            history=[
-            ]
-        )
-        response = chat_session.send_message(prompt)
-
-        return response.text
-
-
-
-
-def generator(model_name):
-    token = os.environ.get("HUGGINGFACE_TOKEN")
-    model = AutoModelForCausalLM.from_pretrained(model_name, 
-                                                cache_dir="models",
-                                                torch_dtype="auto", 
-                                                token = token)
-    tokenizer = AutoTokenizer.from_pretrained(model_name, token)
-
-    def gen(text, max_length=100) -> str:
-        inputs = tokenizer(text, return_tensors="pt", return_attention_mask=False)
-        outputs = model.generate(**inputs, max_length=max_length)
-        text = tokenizer.batch_decode(outputs)[0]
-        return text
-
-    return gen
-
-
 class HuggingFaceLLM(LLM):
-    def __init__(self, model:str):
+    def __init__(self, model: str):
+        # Detect if CUDA is available and set the device accordingly
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         try:
-            self.generator = pipeline('text-generation', model=model)
-        except:
-            self.generator = generator(model)
+            # Load the model and tokenizer
+            self.model = AutoModelForCausalLM.from_pretrained(model, cache_dir="models", torch_dtype=torch.float32).to(self.device)
+            self.tokenizer = AutoTokenizer.from_pretrained(model)
+        except Exception as e:
+            # If there's an issue with loading from pretrained, setup a generator
+            self.generator = self.setup_generator(model)
+        else:
+            # Setup the pipeline if no exceptions
+            self.generator = pipeline('text-generation', model=self.model, tokenizer=self.tokenizer, device=0 if torch.cuda.is_available() else -1)
 
-    def generate(self, prompt:str) -> str:
-        text = self.generator(prompt, max_length=100)[0]
-        return text if not 'generated_text' in text else text['generated_text']
+    def setup_generator(self, model_name):
+        token = os.environ.get("HUGGINGFACE_TOKEN")
+        model = AutoModelForCausalLM.from_pretrained(model_name,
+                                                     cache_dir="models",
+                                                     torch_dtype="auto",
+                                                     use_auth_token=token).to(self.device)
+        tokenizer = AutoTokenizer.from_pretrained(model_name, use_auth_token=token)
+        def gen(text, max_length=100) -> str:
+            inputs = tokenizer(text, return_tensors="pt", return_attention_mask=False)
+            inputs = {k: v.to(self.device) for k, v in inputs.items()}
+            outputs = model.generate(**inputs, max_length=max_length)
+            text = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
+            return text
+        return gen
+
+    def generate(self, prompt: str) -> str:
+        if hasattr(self, 'generator'):
+            return self.generator(prompt, max_length=100)
+        else:
+            inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
+            outputs = self.model.generate(**inputs, max_length=100)
+            return self.tokenizer.decode(outputs[0], skip_special_tokens=True)

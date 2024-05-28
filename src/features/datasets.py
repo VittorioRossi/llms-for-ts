@@ -6,11 +6,11 @@ from features.utils import process_dataset
 
 class Dataset(ABC):
     @abstractmethod
-    def process(self):
+    def process(self, promt_name):
         pass
 
 class CTDataset(Dataset):
-    def __init__(self, path:str = '/data/raw/CT'):
+    def __init__(self, promt_name, path:str = '/data/raw/CT'):
         self.path = path
 
     def process(self, **kwargs):
@@ -22,7 +22,7 @@ class CTDataset(Dataset):
 
 
 class SGFDataset(Dataset):
-    def __init__(self, path:str = '/data/raw/SG'):
+    def __init__(self, promt_name, path:str = '/data/raw/SG'):
         self.path = path
 
     def process(self, **kwargs):
