@@ -10,7 +10,7 @@ class Dataset(ABC):
         pass
 
 class CTDataset(Dataset):
-    def __init__(self, path:str = '/data/raw/CT'):
+    def __init__(self, path:str = 'data/raw/CT'):
         self.path = path
 
     def process(self, promt_name, **kwargs):
@@ -22,7 +22,7 @@ class CTDataset(Dataset):
 
 
 class SGFDataset(Dataset):
-    def __init__(self, path:str = '/data/raw/SG'):
+    def __init__(self, path:str = 'data/raw/SG'):
         self.path = path
 
     def process(self, promt_name, **kwargs):
@@ -36,7 +36,7 @@ class ETTHDataset(Dataset):
     """
     ETTHDataset is a dataset class that takes in a path to the ETTH dataset and processes it.
     """
-    def __init__(self, path:str = '/data/raw/etth'):
+    def __init__(self, path:str = '/data/raw/ETTh1'):
         self.path = path
     
     def process(self, promt_name:str, **kwargs):
