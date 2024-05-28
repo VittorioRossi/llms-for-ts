@@ -17,8 +17,7 @@ class CTDataset(Dataset):
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines('\n')
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines('\n')
         
-        for obs in [(xi, yi) for xi, yi in zip(X, y)]:
-            yield obs
+        return [(xi, yi) for xi, yi in zip(X, y)]
 
 
 class SGFDataset(Dataset):
@@ -29,8 +28,8 @@ class SGFDataset(Dataset):
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines('\n')
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines('\n')
         
-        for obs in [(xi, yi) for xi, yi in zip(X, y)]:
-            yield obs
+        return [(xi, yi) for xi, yi in zip(X, y)]
+            
 
 class ETTHDataset(Dataset):
     """
@@ -50,8 +49,7 @@ class ETTHDataset(Dataset):
         }
         df = df.rename(columns={'OT': 'target'})
         generator = process_dataset(df, promt_name, **config)
-        for observation in generator:
-            yield observation
+        return generator
 
 class M4Dataset(Dataset):
     """
@@ -76,8 +74,7 @@ class M4Dataset(Dataset):
         for chunk in chunks:
             chunk = chunk.melt(id_vars=['V1'], var_name='d', value_name='target')
             generator = process_dataset(chunk, promt_name, **config)
-            for observation in generator:
-                yield observation
+            yield generator
     
 
 
@@ -130,8 +127,7 @@ class M5Dataset(Dataset):
             chunk = chunk.melt(id_vars=metadata, var_name='d', value_name='target')
             chunk = self._merge_metadata(chunk)
             generator = process_dataset(chunk, promt_name, **config)
-            for observation in generator:
-                yield observation
+            yield generator
 
 class GWTDataset(Dataset):
     """
@@ -153,8 +149,7 @@ class GWTDataset(Dataset):
         for chunk in chunks:
             chunk = chunk.melt(id_vars=['Page'], var_name='d', value_name='target')
             generator = process_dataset(chunk, promt_name, **config)
-            for observation in generator:
-                yield observation
+            yield generator
 
 class PEMSDataset(Dataset):
     def __init__(self, path='data/raw/PEMS4') -> None:
