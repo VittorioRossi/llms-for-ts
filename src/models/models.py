@@ -33,18 +33,18 @@ class HuggingFaceLLM(LLM):
                                                      torch_dtype="auto",
                                                      use_auth_token=token).to(self.device)
         tokenizer = AutoTokenizer.from_pretrained(model_name, use_auth_token=token)
-        def gen(text, max_length=100) -> str:
+        def gen(text, max_new_tokens=100) -> str:
             inputs = tokenizer(text, return_tensors="pt", return_attention_mask=False)
             inputs = {k: v.to(self.device) for k, v in inputs.items()}
-            outputs = model.generate(**inputs, max_length=max_length)
+            outputs = model.generate(**inputs, max_new_tokens=max_new_tokens)
             text = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
             return text
         return gen
 
     def generate(self, prompt: str) -> str:
         if hasattr(self, 'generator'):
-            return self.generator(prompt, max_length=100)
+            return self.generator(prompt, max_new_tokens=100)
         else:
             inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
-            outputs = self.model.generate(**inputs, max_length=100)
+            outputs = self.model.generate(**inputs, max_new_tokens=100)
             return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
