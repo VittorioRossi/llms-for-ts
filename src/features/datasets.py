@@ -43,7 +43,8 @@ class ETTHDataset(Dataset):
         self.path = path
     
     def process(self, promt_name:str,batch_size:int, **kwargs):
-        df = pd.read_csv(self.path)
+        df = pd.read_csv(self.path).round(kwargs.get('round', 2))
+
         config = {
             'target': 'target',
             'target_size': kwargs.get('target_size', 1),
@@ -155,7 +156,7 @@ class GWTDataset(Dataset):
             'metadata':  kwargs.get('metadata', ["Page"]),
         }
         for chunk in chunks:
-            chunk = chunk.melt(id_vars=['Page'], var_name='d', value_name='target')
+            chunk = chunk.melt(id_vars=['Page'], var_name='d', value_name='target').astype({'d': 'str', 'target':"int32"})
             X, y = utils.process_dataset(chunk, promt_name, **config)
             for batch in utils.create_batches(X,y, batch_size):
                 yield batch

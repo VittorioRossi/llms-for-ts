@@ -38,7 +38,7 @@ def main(model_name, dataset_name, prompt_name, window_size, target_size, batch_
                                                             window_size=window_size, 
                                                             target_size=target_size,
                                                             batch_size=batch_size,
-                                                            chunk_size=chunk_size)
+                                                            chunksize=chunk_size)
 
     logger.info('Loading model')
     try:
