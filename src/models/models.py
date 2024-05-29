@@ -22,13 +22,8 @@ class HuggingFaceLLM(LLM):
         # Detect if CUDA is available and set the device accordingly
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         try:
-            # Load the model and tokenizer
-            self.model = AutoModelForCausalLM.from_pretrained(model, cache_dir="models", torch_dtype=torch.float32).to(self.device)
-            self.tokenizer = AutoTokenizer.from_pretrained(model)
-        except Exception as e:
-            # If there's an issue with loading from pretrained, setup a generator
             self.generator = self.setup_generator(model)
-        else:
+        except Exception as e:
             # Setup the pipeline if no exceptions
             self.generator = pipeline('text-generation', model=self.model, tokenizer=self.tokenizer, device=0 if torch.cuda.is_available() else -1)
 
