@@ -49,9 +49,10 @@ def main(model_name, dataset_name, prompt_name, window_size, target_size, batch_
     logger.info('Running inference')
     preds = []
     true = []
-    for observation in tqdm(dataset):
-        preds.append(model.generate(observation[0]))
-        true.append(observation[1])
+    # observation is a batch contatinign (X, y) where X has size 64 x window_size and y has size 64 x target_size
+    for observation in tqdm(data_generator):
+        preds.extend(model.generate(observation[0]))
+        true.extend(observation[1])
 
     logger.info('Evaluating model')
     eval = evaluate(true, preds)
