@@ -17,9 +17,11 @@ logger = logging.getLogger(__name__)
 @click.option('--model_name', type=click.STRING, required=True, help='Model identifier on huggingface.co')
 @click.option('--dataset_name', type=click.STRING, required=True, help='Name of the dataset')
 @click.option('--prompt_name', type=click.STRING, required=True, help='Name of the prompt setting')
-@click.option('--window_size', type=click.INT, required=True, help='Window size for the input features')
-@click.option('--target_size', type=click.INT, required=True, help='Target size')
-def main(model_name, dataset_name, prompt_name, window_size, target_size):
+@click.option('--window_size', type=click.INT, help='Window size for the input features', default=24)
+@click.option('--target_size', type=click.INT, help='Target size', default=1)
+@click.option('--batch_size', type=click.INT, help='Batch size', default=64)
+@click.option('--chunk_size', type=click.INT, help='Chunk_size', default=10)
+def main(model_name, dataset_name, prompt_name, window_size, target_size, batch_size=64, chunk_size=10):
 
     # check if dataset_name is in DATASET_LOADERS
     if dataset_name not in DATASET_LOADERS:
@@ -32,11 +34,11 @@ def main(model_name, dataset_name, prompt_name, window_size, target_size):
 
     logger.info('Loading dataset')
 
-    dataset = DATASET_LOADERS[dataset_name].process(prompt_name, 
-                                                    window_size=window_size, target_size=target_size)
-                                                    
-
-
+    data_generator = DATASET_LOADERS[dataset_name].process(prompt_name, 
+                                                            window_size=window_size, 
+                                                            target_size=target_size,
+                                                            batch_size=batch_size,
+                                                            chunk_size=chunk_size)
 
     logger.info('Loading model')
     try:

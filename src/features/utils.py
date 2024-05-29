@@ -5,7 +5,7 @@ import numpy as np
 from pydantic import BaseModel 
 from typing import List, Tuple
 
-from prompt.utils import load_template
+from src.prompt.utils import load_template
 
 class Observation(BaseModel):
     """
@@ -78,7 +78,7 @@ class Observation(BaseModel):
         Returns:
             Tuple[str, np.ndarray]: The rendered observation.
         """
-        return prompt.render(data=self.X, metadata=self.metadata), self.y
+        return prompt.render(data=self.X, metadata=self.metadata)
  
 def _create_observations_w_ft_and_meta(df: pd.DataFrame, target: str, ts_features: List[str], metadata:List[str], window_size: int = 24, target_size: int = 1) -> List[Observation]:
     """
@@ -151,5 +151,10 @@ def process_dataset(dataset: pd.DataFrame,
     # metadata must be a list of strings that represents the column containing the metadata
     # and the name of that metadata in the prompt
     # metadata = ['Page']
-    print(obs)
-    return [ob.render(prompt) for ob in obs]
+    return [ob.render(prompt) for ob in obs], [ob.y for ob in obs]
+
+
+def create_batches(X, y, batch_size):
+    """Yield successive batches from a list."""
+    for i in range(0, len(X), batch_size):
+        yield X[i:i + batch_size], y[i:i + batch_size]

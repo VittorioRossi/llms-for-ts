@@ -2,7 +2,9 @@ from abc import ABC, abstractmethod
 import pandas as pd
 import numpy as np
 
-from features.utils import process_dataset
+from . import utils
+
+
 
 class Dataset(ABC):
     @abstractmethod
@@ -13,22 +15,24 @@ class CTDataset(Dataset):
     def __init__(self, path:str = 'data/raw/CT'):
         self.path = path
 
-    def process(self, promt_name, **kwargs):
+    def process(self, promt_name:str, batch_size:int, **kwargs):
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines('\n')
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines('\n')
         
-        return [(xi, yi) for xi, yi in zip(X, y)]
+        batches = utils.create_batches(X, y, batch_size)
+        return batches # this is a generator
 
 
 class SGFDataset(Dataset):
     def __init__(self, path:str = 'data/raw/SG'):
         self.path = path
 
-    def process(self, promt_name, **kwargs):
+    def process(self, promt_name, batch_size, **kwargs):
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines('\n')
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines('\n')
         
-        return [(xi, yi) for xi, yi in zip(X, y)]
+        batches = utils.create_batches(X, y, batch_size)
+        return batches # this is a generator
             
 
 class ETTHDataset(Dataset):
@@ -38,7 +42,7 @@ class ETTHDataset(Dataset):
     def __init__(self, path:str = '/data/raw/ETTh1'):
         self.path = path
     
-    def process(self, promt_name:str, **kwargs):
+    def process(self, promt_name:str,batch_size:int, **kwargs):
         df = pd.read_csv(self.path)
         config = {
             'target': 'target',
@@ -48,8 +52,8 @@ class ETTHDataset(Dataset):
             'metadata': kwargs.get('metadata', []),
         }
         df = df.rename(columns={'OT': 'target'})
-        generator = process_dataset(df, promt_name, **config)
-        return generator
+        X, y = utils.process_dataset(df, promt_name, **config)
+        return utils.create_batches(X, y, batch_size)
 
 class M4Dataset(Dataset):
     """
@@ -60,7 +64,7 @@ class M4Dataset(Dataset):
         self.df_path = f'{self.path}/' + ('train.csv' if train else 'test.csv')
 
     
-    def process(self, promt_name:str, chunksize = 1000, **kwargs):
+    def process(self, promt_name:str, batch_size, chunksize = 1000, **kwargs):
         chunks = pd.read_csv(self.df_path, chunksize=chunksize)
 
         config = {
@@ -68,13 +72,14 @@ class M4Dataset(Dataset):
             'target_size': kwargs.get('target_size', 1),
             'window_size': kwargs.get('window_size', 24),
             'ts_features': [],
-            'metadata': ["V1"],
+            'metadata': ["V1"]
         }
 
         for chunk in chunks:
             chunk = chunk.melt(id_vars=['V1'], var_name='d', value_name='target')
-            generator = process_dataset(chunk, promt_name, **config)
-            yield generator
+            X,y = utils.process_dataset(chunk, promt_name, **config)
+            for batch in utils.create_batches(X, y, batch_size):
+                yield batch
     
 
 
@@ -104,14 +109,15 @@ class M5Dataset(Dataset):
                         "snap_TX",
                         "snap_WI",
                         "price"]
+
         
+    
     def _merge_metadata(self, df):
         df = df.merge(self.calendar, how='left', on='d')
         df = df.merge(self.prices, how='left', on="wm_yr_wk")
         return df
     
-
-    def process(self, promt_name:str, chunksize = 100, **kwargs):
+    def process(self, promt_name:str, batch_size, chunksize=100, **kwargs):
         chunks = pd.read_csv(self.df_path, chunksize=chunksize)
 
         config = {
@@ -126,8 +132,10 @@ class M5Dataset(Dataset):
         for chunk in chunks:
             chunk = chunk.melt(id_vars=metadata, var_name='d', value_name='target')
             chunk = self._merge_metadata(chunk)
-            generator = process_dataset(chunk, promt_name, **config)
-            yield generator
+            X, y = utils.process_dataset(chunk, promt_name, **config)
+
+            for batch in  utils.create_batches(X, y, batch_size):
+                yield batch
 
 class GWTDataset(Dataset):
     """
@@ -137,7 +145,7 @@ class GWTDataset(Dataset):
         self.path = path
         self.df_path = f'{self.path}/train.csv'
     
-    def process(self, promt_name:str, chunksize = 1000, **kwargs):
+    def process(self, promt_name:str, batch_size, chunksize = 1000, **kwargs):
         chunks = pd.read_csv(self.df_path, chunksize=chunksize)
         config = {
             'target': 'target',
@@ -148,8 +156,9 @@ class GWTDataset(Dataset):
         }
         for chunk in chunks:
             chunk = chunk.melt(id_vars=['Page'], var_name='d', value_name='target')
-            generator = process_dataset(chunk, promt_name, **config)
-            yield generator
+            X, y = utils.process_dataset(chunk, promt_name, **config)
+            for batch in utils.create_batches(X,y, batch_size):
+                yield batch
 
 class PEMSDataset(Dataset):
     def __init__(self, path='data/raw/PEMS4') -> None:
