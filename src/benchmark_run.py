@@ -92,8 +92,9 @@ def main(config_path):
         target_size = experiment.get('target_size', 1)
         batch_size = experiment.get('batch_size', 64)
         chunk_size = experiment.get('chunk_size', 10)
-
-        run_name = f'{model_name.split('/')[1]}_{dataset_name}_{prompt_name}_{window_size}_{target_size}'
+    
+        model_name_clean = model_name.split('/')[1]
+        run_name = f"{model_name_clean}_{dataset_name}_{prompt_name}_{window_size}_{target_size}"
         if dataset_name == 'all':
             for dataset_name in DATASET_LOADERS.keys():
                 evals = run_experiment(model_name,
