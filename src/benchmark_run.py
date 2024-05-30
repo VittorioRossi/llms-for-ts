@@ -63,9 +63,14 @@ def main(model_name, dataset_name, prompt_name, window_size, target_size, batch_
     with open('results.txt', 'w') as f:
         for pred, true in zip(preds, true):
             f.write(f'{pred} {true}\n')
+    
+    preds = np.array(preds).reshape(-1, target_size).astype(float)
+    true = np.array(true).reshape(-1, target_size).astype(float)
 
-    preds = np.array(preds).reshape(-1, target_size)
-    true = np.array(true).reshape(-1, target_size)
+    #save after reshaping
+    np.save('preds.npy', preds)
+
+
 
     logger.info('Evaluating model')
     eval = evaluate(true, preds)
