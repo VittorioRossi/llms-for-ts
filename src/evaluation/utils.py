@@ -13,16 +13,20 @@ def mean_absolute_percentage_error(y_true:np.ndarray, y_pred:np.ndarray) -> floa
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
 def evaluate(y_true:np.array, y_pred:np.array) -> dict:
-    # check that both have shape (n)
-#    if y_true.shape != y_pred.shape:
-#        y_true = y_true.reshape(-1)
-#        y_pred = y_pred.reshape(-1)
 
     assert y_true.shape == y_pred.shape, f'Shapes do not match: {y_true.shape} != {y_pred.shape}'
 
+    nan_mask = np.isnan(y_true) | np.isnan(y_pred)
+    total_elements = y_true.size
+    nan_elements = np.sum(nan_mask)
+    nan_fraction = nan_elements / total_elements
+
+
+    mask = ~nan_mask
     return {
-        'mae': mean_absolute_error(y_true, y_pred),
-        'mse': mean_squared_error(y_true, y_pred),
-        'rmse': root_mean_squared_error(y_true, y_pred),
-        'mape': mean_absolute_percentage_error(y_true, y_pred)
+        'mae': mean_absolute_error(y_true[mask], y_pred[mask]),
+        'mse': mean_squared_error(y_true[mask], y_pred[mask]),
+        'rmse': root_mean_squared_error(y_true[mask], y_pred[mask]),
+        'mape': mean_absolute_percentage_error(y_true[mask], y_pred[mask]),
+        'nan_fraction': nan_fraction
     }

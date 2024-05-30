@@ -52,26 +52,19 @@ def main(model_name, dataset_name, prompt_name, window_size, target_size, batch_
     logger.info('Running inference')
     preds = []
     true = []
+
     # observation is a batch contatinign (X, y) where X has size 64 x window_size and y has size 64 x target_size
     for observation in tqdm(data_generator):
         preds.extend(model.generate(observation[0]))
         true.extend(observation[1])
         #logger.info(f'Predictions: {preds}')
         #logger.info(f'True: {true}')
-        break
-    
-    # log the results into a file
-    with open('results.txt', 'w') as f:
-        for pred, true in zip(preds, true):
-            f.write(f'{pred} {true}\n')
     
     preds = np.array(preds).reshape(-1, target_size).astype(float)
     true = np.array(true).reshape(-1, target_size).astype(float)
 
     #save after reshaping
     np.save('preds.npy', preds)
-
-
 
     logger.info('Evaluating model')
     eval = evaluate(true, preds)
