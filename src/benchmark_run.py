@@ -93,6 +93,7 @@ def main(config_path):
         batch_size = experiment.get('batch_size', 64)
         chunk_size = experiment.get('chunk_size', 10)
 
+        run_name = f'{model_name.split('/')[1]}_{dataset_name}_{prompt_name}_{window_size}_{target_size}'
         if dataset_name == 'all':
             for dataset_name in DATASET_LOADERS.keys():
                 evals = run_experiment(model_name,
@@ -102,7 +103,8 @@ def main(config_path):
                                        target_size,
                                        batch_size,
                                        chunk_size)
-                saving_path = results_dir / f'{model_name}_{dataset_name}_{prompt_name}_{window_size}_{target_size}.txt'
+                saving_path = results_dir / (run_name + '.txt')
+                saving_path.parent.mkdir(parents=True, exist_ok=True)
                 with open(saving_path, 'a+') as f:
                     f.write(evals)
 
@@ -115,8 +117,8 @@ def main(config_path):
                                    batch_size,
                                    chunk_size)
 
-            saving_path = results_dir / f'{model_name}_{dataset_name}_{prompt_name}_{window_size}_{target_size}.txt'
-
+            saving_path = results_dir / (run_name + '.txt')
+            saving_path.parent.mkdir(parents=True, exist_ok=True)
             with open(saving_path, 'a+') as f:
                 f.write(evals)
 

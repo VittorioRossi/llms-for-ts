@@ -6,7 +6,7 @@ experiments:
     batch_size: 64
     chunk_size: 5
     prompt_name: 'base'
-  -  model_name: 'mistralai/Mistral-7B-Instruct-v0.3'
+  - model_name: 'mistralai/Mistral-7B-Instruct-v0.3'
     dataset_name: 'all'
     target_size: 1
     window_size: 15
