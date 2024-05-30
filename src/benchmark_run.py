@@ -8,32 +8,29 @@ import logging
 from tqdm import tqdm
 import click
 import numpy as np
-import pandas as pd
+from pathlib import Path
+import yaml
+
 
 logging.basicConfig(level=logging.INFO, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 logger = logging.getLogger(__name__)
 
-
-@click.command()
-@click.option('--model_name', type=click.STRING, required=True, help='Model identifier on huggingface.co')
-@click.option('--dataset_name', type=click.STRING, required=True, help='Name of the dataset')
-@click.option('--prompt_name', type=click.STRING, required=True, help='Name of the prompt setting')
-@click.option('--window_size', type=click.INT, help='Window size for the input features', default=24)
-@click.option('--target_size', type=click.INT, help='Target size', default=1)
-@click.option('--batch_size', type=click.INT, help='Batch size', default=64)
-@click.option('--chunk_size', type=click.INT, help='Chunk_size', default=10)
-def main(model_name, dataset_name, prompt_name, window_size, target_size, batch_size=64, chunk_size=10):
-
+def run_experiment(model_name, dataset_name, prompt_name, window_size, target_size, batch_size=64, chunk_size=10, preds_path=None):
+    run_name = f'{model_name}_{dataset_name}_{prompt_name}_{window_size}_{target_size}'
     # check if dataset_name is in DATASET_LOADERS
     if dataset_name not in DATASET_LOADERS:
-        raise ValueError(f'Dataset {dataset_name} not found. Available datasets are: {list(DATASET_LOADERS.keys())}')
+        logging.error(f'Dataset {dataset_name} not found. Available datasets are: {list(DATASET_LOADERS.keys())}')
+        return
+        #raise ValueError(f'Dataset {dataset_name} not found. Available datasets are: {list(DATASET_LOADERS.keys())}')
     
     if prompt_name not in get_available_templates():
-        raise ValueError(f'Prompt {prompt_name} not found. Available prompts are: default, random, template')
+        logging.error(f'Prompt {prompt_name} not found. Available prompts are: default, random, template')
+        #raise ValueError(f'Prompt {prompt_name} not found. Available prompts are: default, random, template')
+        return
 
-    logger.info('Running benchmark')
+    logger.info(f'Running benchmark - {run_name}')
 
     logger.info('Loading dataset')
 
@@ -47,7 +44,9 @@ def main(model_name, dataset_name, prompt_name, window_size, target_size, batch_
     try:
         model = HuggingFaceLLM(model_name)
     except Exception as e:
-        raise ValueError(f'Model {model_name} not found. Please check the model name and try again.')
+        logger.error(f'Model {model_name} not found. Please check the model name and try again.')
+        return
+        #raise ValueError(f'Model {model_name} not found. Please check the model name and try again.')
 
     logger.info('Running inference')
     preds = []
@@ -57,20 +56,70 @@ def main(model_name, dataset_name, prompt_name, window_size, target_size, batch_
     for observation in tqdm(data_generator):
         preds.extend(model.generate(observation[0]))
         true.extend(observation[1])
-        #logger.info(f'Predictions: {preds}')
-        #logger.info(f'True: {true}')
-    
+
     preds = np.array(preds).reshape(-1, target_size).astype(float)
     true = np.array(true).reshape(-1, target_size).astype(float)
 
-    #save after reshaping
-    np.save('preds.npy', preds)
+    if preds_path:
+        logger.info(f'Saving predictions to {preds_path}')
+        saving_path = Path(preds_path) / f'{run_name}.npy'
+        np.save(saving_path, preds)
 
     logger.info('Evaluating model')
     eval = evaluate(true, preds)
     logger.info(eval)
 
-    
+    logger.info(f'End of benchmark run - {run_name}')
+
+    return eval
+
+
+@click.command()
+@click.option('--config_path', type=click.STRING, required=True, help='Path to configuration file')
+def main(config_path):
+    config = yaml.safe_load(open(config_path, 'r'))
+    # take the config path title 
+    config_name = Path(config_path).stem
+    # create a directory to save the results
+    results_dir = Path('experiments') / config_name
+    results_dir.mkdir(parents=True, exist_ok=True)
+
+    for experiment in config['experiments']:
+        model_name = experiment['model_name']
+        dataset_name = experiment['dataset_name']
+        prompt_name = experiment['prompt_name']
+        window_size = experiment.get('window_size', 15)
+        target_size = experiment.get('target_size', 1)
+        batch_size = experiment.get('batch_size', 64)
+        chunk_size = experiment.get('chunk_size', 10)
+
+        if dataset_name == 'all':
+            for dataset_name in DATASET_LOADERS.keys():
+                evals = run_experiment(model_name,
+                                       dataset_name,
+                                       prompt_name,
+                                       window_size,
+                                       target_size,
+                                       batch_size,
+                                       chunk_size)
+                saving_path = results_dir / f'{model_name}_{dataset_name}_{prompt_name}_{window_size}_{target_size}.txt'
+                with open(saving_path, 'a+') as f:
+                    f.write(evals)
+
+        else:
+            evals = run_experiment(model_name,
+                                   dataset_name,
+                                   prompt_name,
+                                   window_size,
+                                   target_size,
+                                   batch_size,
+                                   chunk_size)
+
+            saving_path = results_dir / f'{model_name}_{dataset_name}_{prompt_name}_{window_size}_{target_size}.txt'
+
+            with open(saving_path, 'a+') as f:
+                f.write(evals)
+
 
 
 if __name__=='__main__':

@@ -83,8 +83,6 @@ class M4Dataset(Dataset):
             for batch in utils.create_batches(X, y, batch_size):
                 yield batch
     
-
-
 class M5Dataset(Dataset):
     """
     M5Dataset is a dataset class that takes in a path to the M5 dataset and processes it.
@@ -157,7 +155,7 @@ class GWTDataset(Dataset):
             'metadata':  kwargs.get('metadata', ["Page"]),
         }
         for chunk in chunks:
-            chunk = chunk.melt(id_vars=['Page'], var_name='d', value_name='target').astype({'d': 'str', 'target':"int32"})
+            chunk = chunk.melt(id_vars=['Page'], var_name='d', value_name='target').astype({'d': 'str', 'target':"float"})
             X, y = utils.process_dataset(chunk, promt_name, **config)
             for batch in utils.create_batches(X,y, batch_size):
                 yield batch
