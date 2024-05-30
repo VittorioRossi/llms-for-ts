@@ -107,7 +107,7 @@ def main(config_path):
                 saving_path = results_dir / (run_name + '.txt')
                 saving_path.parent.mkdir(parents=True, exist_ok=True)
                 with open(saving_path, 'a+') as f:
-                    f.write(evals)
+                    f.write(evals.__str__())
 
         else:
             evals = run_experiment(model_name,
@@ -121,7 +121,7 @@ def main(config_path):
             saving_path = results_dir / (run_name + '.txt')
             saving_path.parent.mkdir(parents=True, exist_ok=True)
             with open(saving_path, 'a+') as f:
-                f.write(evals)
+                f.write(evals.__str__())
 
 
 

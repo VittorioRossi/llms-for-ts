@@ -24,7 +24,7 @@ def evaluate(y_true:np.array, y_pred:np.array) -> dict:
 
     mask = ~nan_mask
     mask_zeros = (y_true != 0)
-    zero_fraction = np.sum(mask_zeros) / np.sum(mask)
+    zero_fraction = (1-np.sum(mask_zeros)) / len(y_true)
     return {
         'mae': mean_absolute_error(y_true[mask], y_pred[mask]),
         'mse': mean_squared_error(y_true[mask], y_pred[mask]),
