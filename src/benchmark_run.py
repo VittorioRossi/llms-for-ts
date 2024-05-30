@@ -57,13 +57,13 @@ def main(model_name, dataset_name, prompt_name, window_size, target_size, batch_
         preds.extend(model.generate(observation[0]))
         true.extend(observation[1])
 
+    # log the results into a file
+    with open('results.txt', 'w') as f:
+        for pred, true in zip(preds, true):
+            f.write(f'{pred} {true}\n')
+
     preds = np.array(preds).reshape(-1, target_size)
     true = np.array(true).reshape(-1, target_size)
-
-    
-    logger.info('Saving predictions and true values')
-    np.savetxt('predictions.txt', preds)
-    np.savetxt('true_values.txt', true)
 
     logger.info('Evaluating model')
     eval = evaluate(true, preds)
