@@ -60,11 +60,11 @@ def main(model_name, dataset_name, prompt_name, window_size, target_size, batch_
     preds = np.array(preds).reshape(-1, target_size)
     true = np.array(true).reshape(-1, target_size)
 
-    pd.DataFrame({"preds":preds, "true":true}).to_csv('preds.csv', index=False)
-
     logger.info('Evaluating model')
     eval = evaluate(true, preds)
     logger.info(eval)
+
+    pd.DataFrame({"preds":preds, "true":true}).to_csv('preds.csv', index=False)
 
 
 if __name__=='__main__':
