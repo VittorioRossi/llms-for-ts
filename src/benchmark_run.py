@@ -8,6 +8,7 @@ import logging
 from tqdm import tqdm
 import click
 import numpy as np
+import pandas as pd
 
 logging.basicConfig(level=logging.INFO, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -23,6 +24,7 @@ logger = logging.getLogger(__name__)
 @click.option('--target_size', type=click.INT, help='Target size', default=1)
 @click.option('--batch_size', type=click.INT, help='Batch size', default=64)
 @click.option('--chunk_size', type=click.INT, help='Chunk_size', default=10)
+@click.option('--logs', type=click.STRING, help='Logs file', default='logs.txt')
 def main(model_name, dataset_name, prompt_name, window_size, target_size, batch_size=64, chunk_size=10):
 
     # check if dataset_name is in DATASET_LOADERS
@@ -58,6 +60,8 @@ def main(model_name, dataset_name, prompt_name, window_size, target_size, batch_
 
     preds = np.array(preds).reshape(-1, target_size)
     true = np.array(true).reshape(-1, target_size)
+
+    pd.DataFrame({"preds":preds, "true":true}).to_csv('preds.csv', index=False)
 
     logger.info('Evaluating model')
     eval = evaluate(true, preds)

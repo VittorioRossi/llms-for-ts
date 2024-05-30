@@ -110,8 +110,8 @@ class HuggingFaceLLM(LLM):
                 # Decode the new tokens to get the prediction text
                 prediction = tokenizer.decode(new_token_ids, skip_special_tokens=True)
 
-                preds = clean_pred(prediction, target_size)
-                results.append(preds)
+                #preds = clean_pred(prediction, target_size)
+                results.append(prediction)
 
             return results
     
