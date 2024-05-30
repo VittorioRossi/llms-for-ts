@@ -56,8 +56,9 @@ def main(model_name, dataset_name, prompt_name, window_size, target_size, batch_
     for observation in tqdm(data_generator):
         preds.extend(model.generate(observation[0]))
         true.extend(observation[1])
-        logger.info(f'Predictions: {preds}')
-        logger.info(f'True: {true}')
+        #logger.info(f'Predictions: {preds}')
+        #logger.info(f'True: {true}')
+        break
     
     # log the results into a file
     with open('results.txt', 'w') as f:

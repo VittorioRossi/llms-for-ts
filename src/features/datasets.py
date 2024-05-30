@@ -18,7 +18,7 @@ class CTDataset(Dataset):
     def process(self, promt_name:str, batch_size:int, **kwargs):
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines()
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines()
-        
+        X = [x.replace(',', '') for x in X]
         batches = utils.create_batches(X, y, batch_size)
         return batches # this is a generator
 
@@ -30,6 +30,7 @@ class SGFDataset(Dataset):
     def process(self, promt_name, batch_size, **kwargs):
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines()
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines()
+        X = [x.replace(',', '') for x in X]
         
         batches = utils.create_batches(X, y, batch_size)
         return batches # this is a generator
