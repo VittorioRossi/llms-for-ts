@@ -1,0 +1,51 @@
+experiments: 
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    dataset_name: 'all'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
+    chunk_size: 5
+    prompt_name: 'base'
+  -  model_name: 'mistralai/Mistral-7B-Instruct-v0.3'
+    dataset_name: 'all'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
+    chunk_size: 5
+    prompt_name: 'base'
+  - model_name: 'xai-org/grok-1'
+    dataset_name: 'all'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
+    chunk_size: 5
+    prompt_name: 'base'
+  - model_name: 'meta-llama/Meta-Llama-3-8B'
+    dataset_name: 'all'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
+    chunk_size: 5
+    prompt_name: 'base'
+  - model_name: 'meta-llama/Meta-Llama-3-8B-Instruct'
+    dataset_name: 'all'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
+    chunk_size: 5
+    prompt_name: 'base'
+  - model_name: 'google-bert/bert-base-uncased'
+    dataset_name: 'all'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
+    chunk_size: 5
+    prompt_name: 'base'
+  - RoBERTa:
+    model_name: 'FacebookAI/roberta-base'
+    dataset_name: 'all'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
+    chunk_size: 5
+    prompt_name: 'base'
