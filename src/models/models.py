@@ -2,11 +2,33 @@ import torch
 from transformers import pipeline, set_seed, AutoModelForCausalLM, AutoTokenizer
 from abc import ABC, abstractmethod
 import os
-
+import numpy as np
 def set_pad_token_if_missing(tokenizer):
     if tokenizer.pad_token is None:
         tokenizer.add_special_tokens({'pad_token': '[PAD]'})
     return tokenizer
+
+def compute_new_tokens(target_size, example_output, tokenizer):
+    # Tokenize the original input text to find its length
+    original_input_ids = tokenizer(example_output, add_special_tokens=False)['input_ids']
+    original_input_length = len(original_input_ids)
+
+    return original_input_length*target_size
+
+
+def clean_pred(pred:str, target_size:int):
+    # Transform the predicted tokens in a float
+    pred = pred.split(" ")[:target_size]
+    res = []
+    for el in pred:
+        try:
+            res.append(float(el))
+        except:
+            res.append(np.nan)
+
+        
+    return res
+
 
 class LLM(ABC):
     @abstractmethod
@@ -27,7 +49,7 @@ class HuggingFaceLLM(LLM):
             # Setup the pipeline if no exceptions
             self.generator = pipeline('text-generation', model=self.model, tokenizer=self.tokenizer, device=0 if torch.cuda.is_available() else -1)
 
-    def setup_generator(self, model_name):
+    def setup_generator(self, model_name, target_size=1, example_output="00.0"):
         token = os.environ.get("HUGGINGFACE_TOKEN")
         model = AutoModelForCausalLM.from_pretrained(model_name,
                                                      cache_dir="models",
@@ -37,18 +59,20 @@ class HuggingFaceLLM(LLM):
         tokenizer = AutoTokenizer.from_pretrained(model_name, use_auth_token=token)
 
         tokenizer = set_pad_token_if_missing(tokenizer)
+        
+        max_new_tok = compute_new_tokens(target_size, example_output, tokenizer)
 
-        def gen(texts, max_new_tokens=100):
+        def gen(texts, max_new_tokens=None):
             # Ensure the tokenizer has a pad token
+            if max_new_tokens is None:
+                max_new_tokens = max_new_tok
             
             # Tokenize the input texts with padding and truncation enabled
             inputs = tokenizer(
                 texts,
                 return_tensors="pt",
                 padding=True,
-                truncation=True,
-                max_length=512  # Adjust as needed
-            )
+                truncation=True)
             
             # Move the inputs to the appropriate device (CUDA or CPU)
             device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -85,16 +109,18 @@ class HuggingFaceLLM(LLM):
 
                 # Decode the new tokens to get the prediction text
                 prediction = tokenizer.decode(new_token_ids, skip_special_tokens=True)
-                results.append(prediction)
+
+                preds = clean_pred(prediction, target_size)
+                results.append(preds)
 
             return results
     
         return gen 
 
-    def generate(self, prompt: str) -> str:
+    def generate(self, prompt: str, max_new_tokens=None) -> str:
         if hasattr(self, 'generator'):
-            return self.generator(prompt, max_new_tokens=100)
+            return self.generator(prompt, max_new_tokens=max_new_tokens)
         else:
             inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
-            outputs = self.model.generate(**inputs, max_new_tokens=100)
+            outputs = self.model.generate(**inputs, max_new_tokens=max_new_tokens)
             return self.tokenizer.decode(outputs[0], skip_special_tokens=True)

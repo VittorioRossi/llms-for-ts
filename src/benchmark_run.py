@@ -7,11 +7,13 @@ from prompt.utils import get_available_templates
 import logging
 from tqdm import tqdm
 import click
+import numpy as np
 
 logging.basicConfig(level=logging.INFO, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 logger = logging.getLogger(__name__)
+
 
 @click.command()
 @click.option('--model_name', type=click.STRING, required=True, help='Model identifier on huggingface.co')
@@ -53,6 +55,9 @@ def main(model_name, dataset_name, prompt_name, window_size, target_size, batch_
     for observation in tqdm(data_generator):
         preds.extend(model.generate(observation[0]))
         true.extend(observation[1])
+
+    preds = np.array(preds).reshape(-1, target_size)
+    true = np.array(true).reshape(-1, target_size)
 
     logger.info('Evaluating model')
     eval = evaluate(true, preds)
