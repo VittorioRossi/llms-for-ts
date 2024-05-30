@@ -82,7 +82,7 @@ class M4Dataset(Dataset):
             X,y = utils.process_dataset(chunk, promt_name, **config)
             for batch in utils.create_batches(X, y, batch_size):
                 yield batch
-    
+
 class M5Dataset(Dataset):
     """
     M5Dataset is a dataset class that takes in a path to the M5 dataset and processes it.
@@ -90,8 +90,6 @@ class M5Dataset(Dataset):
     def __init__(self, path:str = '/data/raw/m5', train = True):
         self.path = path
     
-        self.calendar = pd.read_csv(f'{self.path}/calendar.csv').astype({'d': 'str'})
-        self.prices = pd.read_csv(f'{self.path}/sell_prices.csv')
         self.df_path = f'{self.path}/' + ('sales_train_validation.csv' if train else 'sales_train_evaluation.csv')
 
         self.feature_cols = ['id', 'item_id', 'dept_id', 'cat_id', 'store_id', 'state_id']
@@ -119,6 +117,10 @@ class M5Dataset(Dataset):
     
     def process(self, promt_name:str, batch_size, chunksize=100, **kwargs):
         chunks = pd.read_csv(self.df_path, chunksize=chunksize)
+        merge_data = kwargs.get('merge', False)
+        if merge_data:
+            self.calendar = pd.read_csv(f'{self.path}/calendar.csv').astype({'d': 'str'})
+            self.prices = pd.read_csv(f'{self.path}/sell_prices.csv')
 
         config = {
             'target': 'target',
@@ -131,7 +133,10 @@ class M5Dataset(Dataset):
         metadata = config.get('metadata')
         for chunk in chunks:
             chunk = chunk.melt(id_vars=metadata, var_name='d', value_name='target')
-            chunk = self._merge_metadata(chunk)
+            
+            if merge_data:
+                chunk = self._merge_metadata(chunk)
+            
             X, y = utils.process_dataset(chunk, promt_name, **config)
 
             for batch in  utils.create_batches(X, y, batch_size):

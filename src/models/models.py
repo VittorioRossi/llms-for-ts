@@ -55,8 +55,11 @@ class HuggingFaceLLM(LLM):
                                                      cache_dir="models",
                                                      torch_dtype="auto",
                                                      use_auth_token=token).to(self.device)
+        tokenizer_kwargs = {}
+        if model_name.__contains__('bert'):
+            tokenizer_kwargs['padding_side'] = 'left'
         
-        tokenizer = AutoTokenizer.from_pretrained(model_name, use_auth_token=token)
+        tokenizer = AutoTokenizer.from_pretrained(model_name, use_auth_token=token, **tokenizer_kwargs)
 
         tokenizer = set_pad_token_if_missing(tokenizer)
         
