@@ -118,7 +118,7 @@ def _create_observations_w_ft_and_meta(df: pd.DataFrame, target: str, ts_feature
         X_fin.append(X)
         y_fin.append(y)
     
-    return X, y, mt
+    return X_fin, y_fin, mt
 
 # Find the indices of the first and last non-NaN values
 def remove_leading_trailing_nans(array):
