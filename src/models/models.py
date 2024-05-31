@@ -1,5 +1,5 @@
 import torch
-from transformers import pipeline, set_seed, AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, AutoModelForSequenceClassification
 from abc import ABC, abstractmethod
 import os
 import numpy as np
@@ -66,16 +66,25 @@ class HuggingFaceLLM(LLM):
         return gen
 
     def load_model(self, model_name, token):
-        return AutoModelForCausalLM.from_pretrained(
-            model_name,
-            cache_dir="models",
-            torch_dtype="auto",
-            use_auth_token=token
-        ).to(self.device)
+        # Load the model with appropriate class
+        if 'bert' in model_name.lower():
+            return AutoModelForSequenceClassification.from_pretrained(
+                model_name,
+                cache_dir="models",
+                torch_dtype="auto",
+                use_auth_token=token
+            ).to(self.device)
+        else:
+            return AutoModelForCausalLM.from_pretrained(
+                model_name,
+                cache_dir="models",
+                torch_dtype="auto",
+                use_auth_token=token
+            ).to(self.device)
 
     def load_tokenizer(self, model_name, token):
         tokenizer_kwargs = {}
-        if 'bert' in model_name:
+        if 'bert' in model_name.lower():
             tokenizer_kwargs['padding_side'] = 'left'
         return AutoTokenizer.from_pretrained(model_name, use_auth_token=token, **tokenizer_kwargs)
 
