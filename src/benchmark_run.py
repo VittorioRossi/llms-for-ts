@@ -58,6 +58,7 @@ def run_experiment(model_name, dataset_name, prompt_name, window_size, target_si
     num_bateches = limit_obs//batch_size
     n_batches = 0
     for observation in tqdm(data_generator, total=num_bateches):
+        logger.info(f'Running inference on {observation}')
         preds.extend(model.generate(observation[0]))
         true.extend(observation[1])
         
