@@ -81,43 +81,64 @@ class Observation(BaseModel):
         """
         return prompt.render(data=self.X, metadata=self.metadata)
 
-def remove_leading_trailing_nans_in_df(df, target):
-    # Create a mask for non-zero values in the target column
-    mask = ~df[target].isna()
+def remove_leading_trailing_nans_in_df(df: pd.DataFrame, target: str) -> pd.DataFrame:
+    """
+    Remove leading and trailing NaNs from the DataFrame based on the target column.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+        target (str): The name of the target column to check for NaNs.
+
+    Returns:
+        pd.DataFrame: The DataFrame with leading and trailing NaNs removed.
+    """
+    mask = df[target].notna()
     
-    # Find the indices of the first and last non-zero values
     if mask.any():
-        first_non_zero_index = mask.idxmax()
-        last_non_zero_index = mask[::-1].idxmax()
-        
-        # Slice the DataFrame to include only rows between these indices
-        df = df.loc[first_non_zero_index:last_non_zero_index]
+        first_valid_index = mask.idxmax()
+        last_valid_index = mask[::-1].idxmax()
+        df = df.loc[first_valid_index:last_valid_index]
     
     return df
-
-def _create_observations_w_ft_and_meta(df: pd.DataFrame, target: str, ts_features: List[str], metadata:List[str], window_size: int = 24, target_size: int = 1) -> List[Observation]:
+def _create_observations_w_ft_and_meta(df: pd.DataFrame, target: str, ts_features: List[str], metadata: List[str], window_size: int = 24, target_size: int = 1) -> List[Observation]:
     """
     Create an observation object with time series features.
 
     Args:
         df (pd.DataFrame): The input DataFrame containing the time series features and target variable.
         target (str): The name of the target variable column in the DataFrame.
-        ts_features (dic): A mapping between names of the time series features and the column names in the DataFrame.
+        ts_features (List[str]): A list of column names for the time series features in the DataFrame.
+        metadata (List[str]): A list of column names for the metadata in the DataFrame.
         window_size (int, optional): The size of the sliding window used to create the observation. Defaults to 24.
         target_size (int, optional): The number of future time steps to predict. Defaults to 1.
 
     Returns:
-        Observation: An observation object containing the input features (X) and target variable (y).
+        List[Observation]: A list of observation objects containing the input features (X) and target variable (y).
     """
-    # remove leading and trailing nans from the target and adjust the dataset accordingly
+    # Remove leading and trailing NaNs from the target and adjust the dataset accordingly
     df = remove_leading_trailing_nans_in_df(df, target)
     
-    ts_features.extend([target])
-    X = [{ft_name: df[ft_name].iloc[i:i + window_size].values for ft_name in ts_features} for i in range(len(df) - window_size - target_size)]
-    y = np.array([df[target].iloc[i + window_size: i+window_size+target_size].values for i in range(len(df) - window_size - target_size)])
+    # Define the range for slicing
+    slice_end = len(df) - window_size - target_size
+
+    # Extend the time series features to include the target column
+    ts_features = ts_features + [target]
+    
+    # Pre-compute metadata values
     mt = {meta: df[meta].iloc[0] for meta in metadata}
-    res = [Observation(X=X, y=y.flatten(), metadata=mt, target_name=target) for X, y in zip(X, y)]
-    return res
+    
+    # Create the list of observations
+    X_fin, y_fin = [], []
+    for i in range(slice_end):
+        y = df[target].iloc[i + window_size: i + window_size + target_size].values.flatten()
+        if y.isnan().any():
+            continue
+
+        X = {ft_name: df[ft_name].iloc[i:i + window_size].values for ft_name in ts_features}
+        X_fin.append(X)
+        y_fin.append(y)
+    
+    return X, y, mt
 
 # Find the indices of the first and last non-NaN values
 def remove_leading_trailing_nans(array):
@@ -157,30 +178,27 @@ def process_dataset(dataset: pd.DataFrame,
     # load the prompt
     prompt: Template = load_template(prompt_name)
 
-    obs = None
+    X, y = [], []
     if len(metadata) != 0:
         assert isinstance(metadata, list), "metadata must be a list of strings"
         assert all([meta in dataset.columns for meta in metadata]), "metadata must be a list of columns in the dataset"
-        obs = []
         #the metadata specifies the object 
         for group in dataset.groupby(metadata):
-            obs_for_object = _create_observations_w_ft_and_meta(group[1], target, 
+            X_group, y_group, mt_group = _create_observations_w_ft_and_meta(group[1], target, 
                                                                 ts_features=ts_features, 
                                                                 metadata=metadata, 
                                                                 window_size=window_size, 
                                                                 target_size=target_size)
-            obs.extend(obs_for_object)
+            X.extend([prompt.render(data=ob, metadata=mt) for ob, mt in zip(X_group, mt_group)])
+            y.extend(y_group)
     else:
-        obs = _create_observations_w_ft_and_meta(dataset, target, 
-                                                 ts_features=ts_features, 
-                                                 metadata=[], 
-                                                 window_size=window_size, 
-                                                 target_size=target_size)
+        X, y, _ = _create_observations_w_ft_and_meta(dataset, target, 
+                                                ts_features=ts_features, 
+                                                metadata=[], 
+                                                window_size=window_size, 
+                                                target_size=target_size)
     
-    # metadata must be a list of strings that represents the column containing the metadata
-    # and the name of that metadata in the prompt
-    # metadata = ['Page']
-    return [ob.render(prompt) for ob in obs], [ob.y for ob in obs]
+    return X, y
 
 def process_univariate(series, prompt_name, window_size, target_size, **kwargs):
     """
@@ -196,12 +214,13 @@ def process_univariate(series, prompt_name, window_size, target_size, **kwargs):
     """
     prompt: Template = load_template(prompt_name)
     series = remove_leading_trailing_nans(series.astype(float))
-    X = [{'target':series[i:i + window_size]} for i in range(len(series) - window_size - target_size)]
-    y = np.array([series[i + window_size: i+window_size+target_size] for i in range(len(series) - window_size - target_size)])
-    res = [Observation(X=X, y=y.flatten(), target_name='target') for X, y in zip(X, y)]
+
     X_res, y_res = [], []
-    
-    for ob in res:
+
+    for i in range(len(series) - window_size - target_size):
+        X = {'target': series[i:i + window_size]}
+        y = np.array(series[i + window_size: i + window_size + target_size])
+        ob = Observation(X=X, y=y.flatten(), target_name='target')
         X_res.append(ob.render(prompt))
         y_res.append(ob.y)
     
