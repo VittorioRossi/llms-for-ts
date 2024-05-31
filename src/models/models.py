@@ -100,12 +100,8 @@ class HuggingFaceLLM(LLM):
 
         results = []
         for text, generated_text in zip(texts, generated_texts):
-            original_input_ids = tokenizer(text, add_special_tokens=False)['input_ids']
-            original_input_length = len(original_input_ids)
-            full_generated_ids = tokenizer(generated_text, add_special_tokens=False)['input_ids']
-            new_token_ids = full_generated_ids[original_input_length:]
-            prediction = tokenizer.decode(new_token_ids, skip_special_tokens=True)
-            print(prediction)
+            start_idx = len(text)
+            prediction = generated_text[start_idx:]
             preds = clean_pred(prediction, target_size)
             results.append(preds)
 
