@@ -16,11 +16,12 @@ def cache_dataset(X, y, cache_folder, **kwargs):
         for x, y in zip(X, y):
             f.write(f'{x},{y}\n')
 
-def load_cached_data(cache_path):
+def load_cached_data(cache_path, batch_size=64):
     with open(cache_path, 'r') as f:
         data = f.readlines()
     X, y = zip(*[line.strip().split(',') for line in data])
-    return X, np.array(y, dtype=float)
+    X, y = X, np.array(y, dtype=float)
+    return utils.create_batches(X, y, batch_size)
 
 class Dataset(ABC):
     @abstractmethod
@@ -36,7 +37,7 @@ class CTDataset(Dataset):
     def process(self, promt_name:str, batch_size:int, **kwargs):
         cache_path = build_cache_path(self.cache_folder, **kwargs)
         if self.cache_folder and cache_path.exists():
-            return load_cached_data(cache_path)
+            return load_cached_data(cache_path, batch_size=batch_size)
 
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines()
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines()
@@ -45,7 +46,7 @@ class CTDataset(Dataset):
         batches = utils.create_batches(X, y, batch_size)
         return batches # this is a generator
 
-class SGFDataset(Dataset):
+class SGDataset(Dataset):
     def __init__(self, path:str = 'data/raw/SG', cache_folder = 'data/processed/SG'):
         self.path = path
         self.cache_folder = cache_folder
@@ -54,7 +55,7 @@ class SGFDataset(Dataset):
     def process(self, promt_name, batch_size, **kwargs):
         cache_path = build_cache_path(self.cache_folder, **kwargs)
         if self.cache_folder and cache_path.exists():
-            return load_cached_data(cache_path)
+            return load_cached_data(cache_path, batch_size=batch_size)
 
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines()
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines()
@@ -76,7 +77,7 @@ class ETTHDataset(Dataset):
     def process(self, promt_name:str,batch_size:int, **kwargs):
         cache_path = build_cache_path(self.cache_folder, **kwargs)
         if self.cache_folder and cache_path.exists():
-            return load_cached_data(cache_path)
+            return load_cached_data(cache_path, batch_size=batch_size)
         
         df = pd.read_csv(self.path).round(kwargs.get('round', 2))
 
@@ -105,7 +106,7 @@ class M4Dataset(Dataset):
     def process(self, promt_name:str, batch_size, chunksize = 1000, **kwargs):
         cache_path = build_cache_path(self.cache_folder, **kwargs)
         if self.cache_folder and cache_path.exists():
-            return load_cached_data(cache_path)
+            return load_cached_data(cache_path, batch_size=batch_size)
         
         chunks = pd.read_csv(self.df_path, chunksize=chunksize)
 
@@ -161,7 +162,7 @@ class M5Dataset(Dataset):
     def process(self, promt_name:str, batch_size, chunksize=100, **kwargs):
         cache_path = build_cache_path(self.cache_folder, **kwargs)
         if self.cache_folder and cache_path.exists():
-            return load_cached_data(cache_path)
+            return load_cached_data(cache_path, batch_size=batch_size)
         
         chunks = pd.read_csv(self.df_path, chunksize=chunksize)
         merge_data = kwargs.get('merge', False)
@@ -204,7 +205,7 @@ class GWTDataset(Dataset):
     def process(self, promt_name:str, batch_size, chunksize = 1000, **kwargs):
         cache_path = build_cache_path(self.cache_folder, **kwargs)
         if self.cache_folder and cache_path.exists():
-            return load_cached_data(cache_path)
+            return load_cached_data(cache_path, batch_size=batch_size)
         
         chunks = pd.read_csv(self.df_path, chunksize=chunksize)
         config = {

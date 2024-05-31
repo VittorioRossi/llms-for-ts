@@ -4,7 +4,7 @@ import os
 cache_folder = os.environ.get('CACHE_FOLDER','data/processed/')
 DATASET_LOADERS = {
     'CT': CTDataset(cache_folder=cache_folder + 'CT'),
-    'SG': SGFDataset(cache_folder=cache_folder + 'SG'),
+    'SG': SGDataset(cache_folder=cache_folder + 'SG'),
     'ETTh1': ETTHDataset(path = 'data/raw/ETTh1/train.csv', cache_folder=cache_folder + 'ETTh1'),
     'ETTh2': ETTHDataset(path = 'data/raw/ETTh2/train.csv', cache_folder=cache_folder + 'ETTh2'),
     'ETTm1': ETTHDataset(path = 'data/raw/ETTm1/train.csv', cache_folder=cache_folder + 'ETTm1'),
