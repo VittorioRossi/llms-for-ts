@@ -17,19 +17,6 @@ def compute_new_tokens(target_size, example_output, tokenizer):
 
     return original_input_length*target_size
 
-def clean_pred(pred:str, target_size:int):
-    # Transform the predicted tokens in a float
-    pred = pred.split(" ")[:target_size]
-    res = []
-    for el in pred:
-        try:
-            res.append(float(el))
-        except:
-            res.append(np.nan)
-
-        
-    return res
-
 
 class LLM(ABC):
     @abstractmethod
@@ -133,9 +120,14 @@ def compute_new_tokens(target_size, example_output, tokenizer):
     example_tokens = tokenizer(example_output, add_special_tokens=False)['input_ids']
     return target_size * len(example_tokens)
 
-def clean_pred(pred: str, target_size: int):
-    # Split the predicted tokens and take only the first `target_size` elements
-    tokens = pred.split(" ")[:target_size]
-    
-    # Convert tokens to floats, using np.nan for any conversion errors
-    return [float(token) if token.replace('.', '', 1).isdigit() else np.nan for token in tokens]
+def clean_pred(pred:str, target_size:int):
+    # Transform the predicted tokens in a float
+    pred = pred.split(" ")[:target_size]
+    res = []
+    for el in pred:
+        try:
+            res.append(float(el))
+        except:
+            res.append(np.nan)
+
+    return res
