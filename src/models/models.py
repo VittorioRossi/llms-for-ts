@@ -95,22 +95,29 @@ class HuggingFaceLLM(LLM):
         )
 
     def decode_outputs(self, tokenizer, texts, outputs, target_size):
+        # Decode the entire generated texts
         generated_texts = tokenizer.batch_decode(outputs, skip_special_tokens=True)
         torch.cuda.empty_cache()
 
+        # Get the original lengths of the input texts in tokens
         original_lengths = [len(tokenizer(text, add_special_tokens=False)['input_ids']) for text in texts]
-        new_texts = [generated_text[len(text):] for generated_text, text in zip(generated_texts, texts)]
 
-        predictions = [
-            tokenizer.decode(
-                tokenizer(new_text, add_special_tokens=False)['input_ids'][original_length:],
-                skip_special_tokens=True
-            )
-            for new_text, original_length in zip(new_texts, original_lengths)
-        ]
+        predictions = []
+        for generated_text, original_length in zip(generated_texts, original_lengths):
+            # Tokenize the generated text to get the tokens
+            full_generated_ids = tokenizer(generated_text, add_special_tokens=False)['input_ids']
 
+            # Extract the new tokens that were generated (excluding the original input tokens)
+            new_token_ids = full_generated_ids[original_length:]
 
-        return [clean_pred(prediction, target_size) for prediction in predictions]
+            # Decode the new tokens to get the prediction text
+            prediction = tokenizer.decode(new_token_ids, skip_special_tokens=True)
+
+            # Clean the prediction and add to results
+            preds = clean_pred(prediction, target_size)
+            predictions.append(preds)
+
+        return predictions
 
 def set_pad_token_if_missing(tokenizer):
     if tokenizer.pad_token is None:
