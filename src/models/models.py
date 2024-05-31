@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, AutoModelForSequenceClassification
+from transformers import AutoModel, AutoTokenizer, BertLMHeadModel
 from abc import ABC, abstractmethod
 import os
 import numpy as np
@@ -40,10 +40,6 @@ class LLM(ABC):
     def generate(self, prompt: str) -> str:
         pass
 
-import os
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
-
 class HuggingFaceLLM(LLM):
     def __init__(self, model: str, example_output="00.0", target_size=1):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -68,14 +64,15 @@ class HuggingFaceLLM(LLM):
     def load_model(self, model_name, token):
         # Load the model with appropriate class
         if 'bert' in model_name.lower():
-            return AutoModelForSequenceClassification.from_pretrained(
+            return BertLMHeadModel.from_pretrained(
                 model_name,
                 cache_dir="models",
                 torch_dtype="auto",
                 use_auth_token=token
+
             ).to(self.device)
         else:
-            return AutoModelForCausalLM.from_pretrained(
+            return AutoModel.from_pretrained(
                 model_name,
                 cache_dir="models",
                 torch_dtype="auto",
