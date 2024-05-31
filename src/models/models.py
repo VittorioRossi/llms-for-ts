@@ -96,7 +96,6 @@ class HuggingFaceLLM(LLM):
 
     def decode_outputs(self, tokenizer, texts, outputs, target_size):
         generated_texts = tokenizer.batch_decode(outputs, skip_special_tokens=True)
-        print(generated_texts)
         torch.cuda.empty_cache()
 
         original_lengths = [len(tokenizer(text, add_special_tokens=False)['input_ids']) for text in texts]
@@ -110,7 +109,6 @@ class HuggingFaceLLM(LLM):
             for new_text, original_length in zip(new_texts, original_lengths)
         ]
 
-        print(predictions)
 
         return [clean_pred(prediction, target_size) for prediction in predictions]
 
