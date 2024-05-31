@@ -81,26 +81,6 @@ class Observation(BaseModel):
         """
         return prompt.render(data=self.X, metadata=self.metadata)
 
-def remove_leading_trailing_nans_in_df(df: pd.DataFrame, target: str) -> pd.DataFrame:
-    """
-    Remove leading and trailing NaNs from the DataFrame based on the target column.
-
-    Args:
-        df (pd.DataFrame): The input DataFrame.
-        target (str): The name of the target column to check for NaNs.
-
-    Returns:
-        pd.DataFrame: The DataFrame with leading and trailing NaNs removed.
-    """
-    mask = df[target].notna()
-    
-    if mask.any():
-        first_valid_index = mask.idxmax()
-        last_valid_index = mask[::-1].idxmax()
-        df = df.loc[first_valid_index:last_valid_index]
-    
-    return df
-
 def _create_observations_w_ft_and_meta(df: pd.DataFrame, target: str, ts_features: List[str], metadata: List[str], window_size: int = 24, target_size: int = 1) -> List[Observation]:
     """
     Create an observation object with time series features.
@@ -117,8 +97,7 @@ def _create_observations_w_ft_and_meta(df: pd.DataFrame, target: str, ts_feature
         List[Observation]: A list of observation objects containing the input features (X) and target variable (y).
     """
     # Remove leading and trailing NaNs from the target and adjust the dataset accordingly
-    df = remove_leading_trailing_nans_in_df(df, target)
-    
+
     # Define the range for slicing
     slice_end = len(df) - window_size - target_size
 
@@ -132,7 +111,8 @@ def _create_observations_w_ft_and_meta(df: pd.DataFrame, target: str, ts_feature
     X_fin, y_fin = [], []
     for i in range(slice_end):
         y = df[target].iloc[i + window_size: i + window_size + target_size].values.flatten()
-
+        if np.isnan(y).any():
+            continue
 
         X = {ft_name: df[ft_name].iloc[i:i + window_size].values for ft_name in ts_features}
         X_fin.append(X)
@@ -150,6 +130,7 @@ def remove_leading_trailing_nans(array):
     else:
         # If the array is entirely NaNs, return an empty array
         return np.array([], dtype=array.dtype)
+
 
 def process_dataset(dataset: pd.DataFrame,
                     prompt_name: str, 

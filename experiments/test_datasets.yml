@@ -1,22 +1,10 @@
+results_path: '/content/gdrive/MyDrive/tesi'
 experiments:
     - model_name: 'google-bert/bert-base-uncased'
-      dataset_name: 'M4-month'
+      dataset_name: 'all'
       target_size: 1
-      window_size: 15
-      batch_size: 64
-      chunk_size: 5
+      window_size: 1
+      batch_size: 32
+      chunk_size: 1
       prompt_name: 'base'
-    - model_name: 'google-bert/bert-base-uncased'
-      dataset_name: 'M5'
-      target_size: 1
-      window_size: 15
-      batch_size: 64
-      chunk_size: 5
-      prompt_name: 'base'
-    - model_name: 'google-bert/bert-base-uncased'
-      dataset_name: 'GWT'
-      target_size: 1
-      window_size: 15
-      batch_size: 64
-      chunk_size: 5
-      prompt_name: 'base'
+      limit_obs: 64

@@ -60,6 +60,7 @@ def run_experiment(model_name, dataset_name, prompt_name, window_size, target_si
     for observation in tqdm(data_generator, total=num_bateches):
         preds.extend(model.generate(observation[0]))
         true.extend(observation[1])
+        
 
         n_batches += 1
         if n_batches == num_bateches:

@@ -8,7 +8,6 @@ experiments:
     chunk_size: 5
     prompt_name: 'base'
     limit_obs: 50000
-    univariate: True
   - model_name: 'xai-org/grok-1'
     dataset_name: 'all'
     target_size: 1
@@ -17,7 +16,6 @@ experiments:
     chunk_size: 5
     prompt_name: 'base'
     limit_obs: 50000
-    univariate: True
   - model_name: 'meta-llama/Meta-Llama-3-8B'
     dataset_name: 'all'
     target_size: 1
@@ -26,7 +24,6 @@ experiments:
     chunk_size: 5
     prompt_name: 'base'
     limit_obs: 50000
-    univariate: True
   - model_name: 'meta-llama/Meta-Llama-3-8B-Instruct'
     dataset_name: 'all'
     target_size: 1
@@ -35,7 +32,6 @@ experiments:
     chunk_size: 5
     prompt_name: 'base'
     limit_obs: 50000
-    univariate: True
   - model_name: 'google-bert/bert-base-uncased'
     dataset_name: 'all'
     target_size: 1
@@ -44,7 +40,6 @@ experiments:
     chunk_size: 5
     prompt_name: 'base'
     limit_obs: 50000
-    univariate: True
   - RoBERTa:
     model_name: 'FacebookAI/roberta-base'
     dataset_name: 'all'
@@ -54,7 +49,6 @@ experiments:
     chunk_size: 5
     prompt_name: 'base'
     limit_obs: 50000
-    univariate: True
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     dataset_name: 'all'
     target_size: 1
@@ -63,4 +57,3 @@ experiments:
     chunk_size: 5
     prompt_name: 'base'
     limit_obs: 50000
-    univariate: True
