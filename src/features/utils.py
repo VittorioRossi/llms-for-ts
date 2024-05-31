@@ -5,7 +5,7 @@ import numpy as np
 from pydantic import BaseModel 
 from typing import List, Tuple
 
-from src.prompt import load_template
+from prompt import load_template
 
 class Observation(BaseModel):
     """

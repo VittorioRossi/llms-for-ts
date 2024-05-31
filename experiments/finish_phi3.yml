@@ -8,7 +8,7 @@ experiments:
     chunk_size: 10
     prompt_name: 'base'
     limit_obs: 50000
-    univariate: True
+    univariate: False
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     dataset_name: 'M4-week'
     target_size: 1
@@ -17,7 +17,7 @@ experiments:
     chunk_size: 10
     prompt_name: 'base'
     limit_obs: 50000
-    univariate: True
+    univariate: False
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     dataset_name: 'M4-quarter'
     target_size: 1
@@ -26,7 +26,7 @@ experiments:
     chunk_size: 10
     prompt_name: 'base'
     limit_obs: 50000
-    univariate: True
+    univariate: False
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     dataset_name: 'M5'
     target_size: 1
