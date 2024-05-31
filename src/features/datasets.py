@@ -10,6 +10,7 @@ def build_cache_path(cache_folder, window_size, target_size,  prompt_name= '', *
 
 def cache_dataset(X, y, cache_folder, **kwargs):
     cache_path = build_cache_path(cache_folder, **kwargs)
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
     
     with open(cache_path, 'a+') as f:
         for x, y in zip(X, y):
