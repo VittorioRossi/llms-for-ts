@@ -211,4 +211,7 @@ def process_univariate(series, prompt_name, window_size, target_size, **kwargs):
 def create_batches(X, y, batch_size):
     """Yield successive batches from a list."""
     for i in range(0, len(X), batch_size):
-        yield X[i:i + batch_size], y[i:i + batch_size]
+        if isinstance(X, list):
+            yield X[i:i + batch_size], y[i:i + batch_size]
+        else:
+            yield X.iloc[i:i + batch_size], y.iloc[i:i + batch_size]
