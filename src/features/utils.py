@@ -83,7 +83,7 @@ class Observation(BaseModel):
 
 def remove_leading_trailing_nans_in_df(df, target):
     # Create a mask for non-zero values in the target column
-    mask = df[target].isna()
+    mask = ~df[target].isna()
     
     # Find the indices of the first and last non-zero values
     if mask.any():
