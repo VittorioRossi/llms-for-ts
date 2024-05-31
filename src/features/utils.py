@@ -100,6 +100,7 @@ def remove_leading_trailing_nans_in_df(df: pd.DataFrame, target: str) -> pd.Data
         df = df.loc[first_valid_index:last_valid_index]
     
     return df
+
 def _create_observations_w_ft_and_meta(df: pd.DataFrame, target: str, ts_features: List[str], metadata: List[str], window_size: int = 24, target_size: int = 1) -> List[Observation]:
     """
     Create an observation object with time series features.
@@ -131,8 +132,7 @@ def _create_observations_w_ft_and_meta(df: pd.DataFrame, target: str, ts_feature
     X_fin, y_fin = [], []
     for i in range(slice_end):
         y = df[target].iloc[i + window_size: i + window_size + target_size].values.flatten()
-        if y.isnan().any():
-            continue
+
 
         X = {ft_name: df[ft_name].iloc[i:i + window_size].values for ft_name in ts_features}
         X_fin.append(X)
