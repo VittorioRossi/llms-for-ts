@@ -1,4 +1,4 @@
-results_path: 'experiments'
+results_path: '/content/gdrive/MyDrive/tesi'
 experiments: 
   - model_name: 'mistralai/Mistral-7B-Instruct-v0.3'
     dataset_name: 'all'

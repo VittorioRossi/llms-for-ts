@@ -18,7 +18,8 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger(__name__)
 
 def run_experiment(model_name, dataset_name, prompt_name, window_size, target_size, batch_size=64, chunk_size=10, preds_path=None, univariate=False, limit_obs=None):
-    run_name = f'{model_name}_{dataset_name}_{prompt_name}_{window_size}_{target_size}'
+    model_name_clean = model_name.split('/')[1]
+    run_name = f'{model_name_clean}_{dataset_name}_{prompt_name}_{window_size}_{target_size}'
     # check if dataset_name is in DATASET_LOADERS
     if dataset_name not in DATASET_LOADERS:
         logging.error(f'Dataset {dataset_name} not found. Available datasets are: {list(DATASET_LOADERS.keys())}')
@@ -38,7 +39,8 @@ def run_experiment(model_name, dataset_name, prompt_name, window_size, target_si
                                                             window_size=window_size, 
                                                             target_size=target_size,
                                                             batch_size=batch_size,
-                                                            chunksize=chunk_size)
+                                                            chunksize=chunk_size,
+                                                            univariate=univariate)
 
     logger.info('Loading model')
     try:
@@ -70,6 +72,7 @@ def run_experiment(model_name, dataset_name, prompt_name, window_size, target_si
     if preds_path:
         logger.info(f'Saving predictions to {preds_path}')
         saving_path = Path(preds_path) / f'{run_name}.npy'
+        saving_path.parent.mkdir(parents=True, exist_ok=True)
         np.save(saving_path, preds)
 
     logger.info('Evaluating model')
