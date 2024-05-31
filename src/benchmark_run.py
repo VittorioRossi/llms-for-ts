@@ -70,8 +70,6 @@ def run_experiment(model_name, dataset_name, prompt_name, window_size, target_si
 
         n_batches += 1
 
-    print(true)
-    print(preds)
     preds = np.array(preds).reshape(-1, target_size).astype(float)
     true = np.array(true).reshape(-1, target_size).astype(float)
 
