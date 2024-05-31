@@ -110,6 +110,8 @@ class HuggingFaceLLM(LLM):
             for new_text, original_length in zip(new_texts, original_lengths)
         ]
 
+        print(predictions)
+
         return [clean_pred(prediction, target_size) for prediction in predictions]
 
 def set_pad_token_if_missing(tokenizer):
