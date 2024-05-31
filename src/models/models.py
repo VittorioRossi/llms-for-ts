@@ -40,11 +40,11 @@ class LLM(ABC):
         pass
 
 class HuggingFaceLLM(LLM):
-    def __init__(self, model: str):
+    def __init__(self, model: str, example_output="00.0"):
         # Detect if CUDA is available and set the device accordingly
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         try:
-            self.generator = self.setup_generator(model)
+            self.generator = self.setup_generator(model, example_output=example_output)
         except Exception as e:
             # Setup the pipeline if no exceptions
             self.generator = pipeline('text-generation', model=self.model, tokenizer=self.tokenizer, device=0 if torch.cuda.is_available() else -1)

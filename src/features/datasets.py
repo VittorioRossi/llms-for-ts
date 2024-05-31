@@ -31,6 +31,7 @@ class CTDataset(Dataset):
     def __init__(self, path:str = 'data/raw/CT', cache_folder = 'data/processed/CT'):
         self.path = path
         self.cache_folder = cache_folder
+        self.example_output = "000"
 
     def process(self, promt_name:str, batch_size:int, **kwargs):
         cache_path = build_cache_path(self.cache_folder, **kwargs)
@@ -48,6 +49,7 @@ class SGFDataset(Dataset):
     def __init__(self, path:str = 'data/raw/SG', cache_folder = 'data/processed/SG'):
         self.path = path
         self.cache_folder = cache_folder
+        self.example_output = "000"
 
     def process(self, promt_name, batch_size, **kwargs):
         cache_path = build_cache_path(self.cache_folder, **kwargs)
@@ -69,6 +71,7 @@ class ETTHDataset(Dataset):
     def __init__(self, path:str = '/data/raw/ETTh1', cache_folder = 'data/processed/ETTh1'):
         self.path = path
         self.cache_folder = cache_folder
+        self.example_output = "00"
     
     def process(self, promt_name:str,batch_size:int, **kwargs):
         cache_path = build_cache_path(self.cache_folder, **kwargs)
@@ -97,6 +100,7 @@ class M4Dataset(Dataset):
         self.path = path
         self.df_path = f'{self.path}/' + ('train.csv' if train else 'test.csv')
         self.cache_folder = cache_folder
+        self.example_output = "00000.00"
     
     def process(self, promt_name:str, batch_size, chunksize = 1000, **kwargs):
         cache_path = build_cache_path(self.cache_folder, **kwargs)
@@ -127,6 +131,7 @@ class M5Dataset(Dataset):
     def __init__(self, path:str = '/data/raw/m5', train = True, cache_folder = 'data/processed/m5', **kwargs):
         self.path = path
         self.cache_folder = cache_folder
+        self.example_output = "000"
     
         self.df_path = f'{self.path}/' + ('sales_train_validation.csv' if train else 'sales_train_evaluation.csv')
 
@@ -194,6 +199,7 @@ class GWTDataset(Dataset):
         self.path = path
         self.df_path = f'{self.path}/train.csv'
         self.cache_folder = cache_folder
+        self.example_output = "0000"
     
     def process(self, promt_name:str, batch_size, chunksize = 1000, **kwargs):
         cache_path = build_cache_path(self.cache_folder, **kwargs)

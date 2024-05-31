@@ -35,20 +35,21 @@ def run_experiment(model_name, dataset_name, prompt_name, window_size, target_si
 
     logger.info('Loading dataset')
 
-    data_generator = DATASET_LOADERS[dataset_name].process(prompt_name, 
-                                                            window_size=window_size, 
-                                                            target_size=target_size,
-                                                            batch_size=batch_size,
-                                                            chunksize=chunk_size,
-                                                            univariate=univariate)
+    dataset = DATASET_LOADERS[dataset_name]
+    data_generator = dataset.process(prompt_name, 
+                                    window_size=window_size, 
+                                    target_size=target_size,
+                                    batch_size=batch_size,
+                                    chunksize=chunk_size,
+                                    univariate=univariate)
+
 
     logger.info('Loading model')
     try:
-        model = HuggingFaceLLM(model_name)
+        model = HuggingFaceLLM(model_name, example_output=dataset.example_output)
     except Exception as e:
         logger.error(f'Model {model_name} not found. Please check the model name and try again.')
         return
-        #raise ValueError(f'Model {model_name} not found. Please check the model name and try again.')
 
     logger.info('Running inference')
     preds = []
@@ -58,7 +59,6 @@ def run_experiment(model_name, dataset_name, prompt_name, window_size, target_si
     num_bateches = limit_obs//batch_size
     n_batches = 0
     for observation in tqdm(data_generator, total=num_bateches):
-        logger.info(f'Running inference on {observation}')
         prediction = model.generate(observation[0])
         preds.extend(prediction)
         true.extend(observation[1])
