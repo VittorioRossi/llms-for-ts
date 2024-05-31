@@ -22,7 +22,6 @@ class CTDataset(Dataset):
         batches = utils.create_batches(X, y, batch_size)
         return batches # this is a generator
 
-
 class SGFDataset(Dataset):
     def __init__(self, path:str = 'data/raw/SG'):
         self.path = path
@@ -34,7 +33,7 @@ class SGFDataset(Dataset):
         
         batches = utils.create_batches(X, y, batch_size)
         return batches # this is a generator
-            
+    
 
 class ETTHDataset(Dataset):
     """
@@ -67,6 +66,15 @@ class M4Dataset(Dataset):
 
     
     def process(self, promt_name:str, batch_size, chunksize = 1000, **kwargs):
+        if kwargs.get('univariate', False):
+            chunks = pd.read_csv(self.df_path, chunksize=1)
+            for chunk in chunks:
+                X, y = utils.process_univariate(chunk.values[0][1:], promt_name, **kwargs)
+                batches = utils.create_batches(X, y, batch_size)
+                for batch in batches:
+                    yield batch
+            return 
+
         chunks = pd.read_csv(self.df_path, chunksize=chunksize)
 
         config = {
@@ -116,6 +124,15 @@ class M5Dataset(Dataset):
         return df
     
     def process(self, promt_name:str, batch_size, chunksize=100, **kwargs):
+        if kwargs.get('univariate', False):
+            chunks = pd.read_csv(self.df_path, chunksize=1)
+            for chunk in chunks:
+                X, y = utils.process_univariate(chunk.values[0][6:], promt_name, **kwargs)
+                batches = utils.create_batches(X, y, batch_size)
+                for batch in batches:
+                    yield batch
+            return 
+
         chunks = pd.read_csv(self.df_path, chunksize=chunksize)
         merge_data = kwargs.get('merge', False)
         if merge_data:
@@ -133,7 +150,7 @@ class M5Dataset(Dataset):
         metadata = config.get('metadata')
         for chunk in chunks:
             chunk = chunk.melt(id_vars=metadata, var_name='d', value_name='target')
-            
+
             if merge_data:
                 chunk = self._merge_metadata(chunk)
             
@@ -151,6 +168,14 @@ class GWTDataset(Dataset):
         self.df_path = f'{self.path}/train.csv'
     
     def process(self, promt_name:str, batch_size, chunksize = 1000, **kwargs):
+        if kwargs.get('univariate', False):
+            chunks = pd.read_csv("data/raw/gwt/train.csv", chunksize=1)
+            for chunk in chunks:
+                X, y = utils.process_univariate(chunk.values[0][1:], 'base', **kwargs)
+                batches = utils.create_batches(X, y, batch_size)
+                for batch in batches:
+                    yield batch
+        
         chunks = pd.read_csv(self.df_path, chunksize=chunksize)
         config = {
             'target': 'target',
@@ -164,6 +189,7 @@ class GWTDataset(Dataset):
             X, y = utils.process_dataset(chunk, promt_name, **config)
             for batch in utils.create_batches(X,y, batch_size):
                 yield batch
+
 
 class PEMSDataset(Dataset):
     def __init__(self, path='data/raw/PEMS4') -> None:

@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO,
 
 logger = logging.getLogger(__name__)
 
-def run_experiment(model_name, dataset_name, prompt_name, window_size, target_size, batch_size=64, chunk_size=10, preds_path=None):
+def run_experiment(model_name, dataset_name, prompt_name, window_size, target_size, batch_size=64, chunk_size=10, preds_path=None, univariate=False, limit_obs=None):
     run_name = f'{model_name}_{dataset_name}_{prompt_name}_{window_size}_{target_size}'
     # check if dataset_name is in DATASET_LOADERS
     if dataset_name not in DATASET_LOADERS:
@@ -53,9 +53,16 @@ def run_experiment(model_name, dataset_name, prompt_name, window_size, target_si
     true = []
 
     # observation is a batch contatinign (X, y) where X has size 64 x window_size and y has size 64 x target_size
-    for observation in tqdm(data_generator):
+    num_bateches = limit_obs//batch_size
+    n_batches = 0
+    for observation in tqdm(data_generator, total=num_bateches):
         preds.extend(model.generate(observation[0]))
         true.extend(observation[1])
+        
+        n_batches += 1
+        if n_batches == num_bateches:
+            break
+
 
     preds = np.array(preds).reshape(-1, target_size).astype(float)
     true = np.array(true).reshape(-1, target_size).astype(float)
@@ -81,8 +88,9 @@ def main(config_path):
     # take the config path title 
     config_name = Path(config_path).stem
     # create a directory to save the results
-    results_dir = Path('experiments') / config_name
+    results_dir = Path(config.get('results_path','experiments')) / config_name
     results_dir.mkdir(parents=True, exist_ok=True)
+    
 
     for experiment in config['experiments']:
         model_name = experiment['model_name']
@@ -92,6 +100,9 @@ def main(config_path):
         target_size = experiment.get('target_size', 1)
         batch_size = experiment.get('batch_size', 64)
         chunk_size = experiment.get('chunk_size', 10)
+        univariate = experiment.get('univariate', False)
+        limit_obs = experiment.get('limit_obs', 50_000)
+
     
         model_name_clean = model_name.split('/')[1]
         run_name = f"{model_name_clean}_{dataset_name}_{prompt_name}_{window_size}_{target_size}"
@@ -103,7 +114,10 @@ def main(config_path):
                                        window_size,
                                        target_size,
                                        batch_size,
-                                       chunk_size)
+                                       chunk_size,
+                                       results_dir,
+                                       univariate,
+                                       limit_obs)
                 saving_path = results_dir / (run_name + '.txt')
                 saving_path.parent.mkdir(parents=True, exist_ok=True)
                 with open(saving_path, 'a+') as f:
@@ -116,7 +130,10 @@ def main(config_path):
                                    window_size,
                                    target_size,
                                    batch_size,
-                                   chunk_size)
+                                   chunk_size,
+                                   results_dir,
+                                   univariate,
+                                   limit_obs)
 
             saving_path = results_dir / (run_name + '.txt')
             saving_path.parent.mkdir(parents=True, exist_ok=True)

@@ -5,7 +5,7 @@ import numpy as np
 from pydantic import BaseModel 
 from typing import List, Tuple
 
-from prompt.utils import load_template
+from src.prompt import load_template
 
 class Observation(BaseModel):
     """
@@ -79,7 +79,7 @@ class Observation(BaseModel):
             Tuple[str, np.ndarray]: The rendered observation.
         """
         return prompt.render(data=self.X, metadata=self.metadata)
- 
+
 def _create_observations_w_ft_and_meta(df: pd.DataFrame, target: str, ts_features: List[str], metadata:List[str], window_size: int = 24, target_size: int = 1) -> List[Observation]:
     """
     Create an observation object with time series features.
@@ -152,6 +152,42 @@ def process_dataset(dataset: pd.DataFrame,
     # and the name of that metadata in the prompt
     # metadata = ['Page']
     return [ob.render(prompt) for ob in obs], [ob.y for ob in obs]
+
+# Find the indices of the first and last non-NaN values
+def remove_leading_trailing_nans(array):
+    mask = ~np.isnan(array)
+    if mask.any():
+        first_valid_index = np.argmax(mask)
+        last_valid_index = len(mask) - np.argmax(mask[::-1]) - 1
+        return array[first_valid_index:last_valid_index + 1]
+    else:
+        # If the array is entirely NaNs, return an empty array
+        return np.array([], dtype=array.dtype)
+
+def process_univariate(series, prompt_name, window_size, target_size, **kwargs):
+    """
+    Create an observation object with a univariate time series.
+
+    Args:
+        series (pd.Series): The input time series.
+        window_size (int): The size of the sliding window used to create the observation.
+        target_size (int): The number of future time steps to predict.
+
+    Returns:
+        Observation: An observation object containing the input features (X) and target variable (y).
+    """
+    prompt: Template = load_template(prompt_name)
+    series = remove_leading_trailing_nans(series.astype(float))
+    X = [{'target':series[i:i + window_size]} for i in range(len(series) - window_size - target_size)]
+    y = np.array([series[i + window_size: i+window_size+target_size] for i in range(len(series) - window_size - target_size)])
+    res = [Observation(X=X, y=y.flatten(), target_name='target') for X, y in zip(X, y)]
+    X_res, y_res = [], []
+    
+    for ob in res:
+        X_res.append(ob.render(prompt))
+        y_res.append(ob.y)
+    
+    return X_res, y_res
 
 
 def create_batches(X, y, batch_size):
