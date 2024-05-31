@@ -58,7 +58,7 @@ def run_experiment(model_name, dataset_name, prompt_name, window_size, target_si
     for observation in tqdm(data_generator, total=num_bateches):
         preds.extend(model.generate(observation[0]))
         true.extend(observation[1])
-        
+
         n_batches += 1
         if n_batches == num_bateches:
             break
@@ -121,7 +121,7 @@ def main(config_path):
                 saving_path = results_dir / (run_name + '.txt')
                 saving_path.parent.mkdir(parents=True, exist_ok=True)
                 with open(saving_path, 'a+') as f:
-                    f.write(evals.__str__())
+                    f.write(evals.__str__() + '\n')
 
         else:
             evals = run_experiment(model_name,
@@ -138,7 +138,7 @@ def main(config_path):
             saving_path = results_dir / (run_name + '.txt')
             saving_path.parent.mkdir(parents=True, exist_ok=True)
             with open(saving_path, 'a+') as f:
-                f.write(evals.__str__())
+                f.write(evals.__str__() + '\n')
 
 
 

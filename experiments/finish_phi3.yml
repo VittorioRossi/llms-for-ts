@@ -1,24 +1,6 @@
 results_path: 'experiments'
 experiments: 
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
-    dataset_name: 'GWT'
-    target_size: 1
-    window_size: 15
-    batch_size: 128
-    chunk_size: 5
-    prompt_name: 'base'
-    limit_obs: 50000
-    univariate: True
-  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
-    dataset_name: 'M5'
-    target_size: 1
-    window_size: 15
-    batch_size: 128
-    chunk_size: 5
-    prompt_name: 'base'
-    limit_obs: 50000
-    univariate: True
-  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     dataset_name: 'M4-month'
     target_size: 1
     window_size: 15
@@ -38,6 +20,24 @@ experiments:
     univariate: True
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     dataset_name: 'M4-quarter'
+    target_size: 1
+    window_size: 15
+    batch_size: 128
+    chunk_size: 5
+    prompt_name: 'base'
+    limit_obs: 50000
+    univariate: True
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    dataset_name: 'M5'
+    target_size: 1
+    window_size: 15
+    batch_size: 128
+    chunk_size: 5
+    prompt_name: 'base'
+    limit_obs: 50000
+    univariate: True
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    dataset_name: 'GWT'
     target_size: 1
     window_size: 15
     batch_size: 128
