@@ -23,6 +23,7 @@ class Observation(BaseModel):
     target_name: str
     metadata: dict = {}
 
+
     def window_size(self):
         """
         Returns the window size of the observation.
@@ -80,6 +81,20 @@ class Observation(BaseModel):
         """
         return prompt.render(data=self.X, metadata=self.metadata)
 
+def remove_leading_trailing_nans_in_df(df, target):
+    # Create a mask for non-zero values in the target column
+    mask = df[target].isna()
+    
+    # Find the indices of the first and last non-zero values
+    if mask.any():
+        first_non_zero_index = mask.idxmax()
+        last_non_zero_index = mask[::-1].idxmax()
+        
+        # Slice the DataFrame to include only rows between these indices
+        df = df.loc[first_non_zero_index:last_non_zero_index]
+    
+    return df
+
 def _create_observations_w_ft_and_meta(df: pd.DataFrame, target: str, ts_features: List[str], metadata:List[str], window_size: int = 24, target_size: int = 1) -> List[Observation]:
     """
     Create an observation object with time series features.
@@ -94,12 +109,26 @@ def _create_observations_w_ft_and_meta(df: pd.DataFrame, target: str, ts_feature
     Returns:
         Observation: An observation object containing the input features (X) and target variable (y).
     """
+    # remove leading and trailing nans from the target and adjust the dataset accordingly
+    df = remove_leading_trailing_nans_in_df(df, target)
+    
     ts_features.extend([target])
     X = [{ft_name: df[ft_name].iloc[i:i + window_size].values for ft_name in ts_features} for i in range(len(df) - window_size - target_size)]
     y = np.array([df[target].iloc[i + window_size: i+window_size+target_size].values for i in range(len(df) - window_size - target_size)])
     mt = {meta: df[meta].iloc[0] for meta in metadata}
     res = [Observation(X=X, y=y.flatten(), metadata=mt, target_name=target) for X, y in zip(X, y)]
     return res
+
+# Find the indices of the first and last non-NaN values
+def remove_leading_trailing_nans(array):
+    mask = ~np.isnan(array)
+    if mask.any():
+        first_valid_index = np.argmax(mask)
+        last_valid_index = len(mask) - np.argmax(mask[::-1]) - 1
+        return array[first_valid_index:last_valid_index + 1]
+    else:
+        # If the array is entirely NaNs, return an empty array
+        return np.array([], dtype=array.dtype)
 
 def process_dataset(dataset: pd.DataFrame,
                     prompt_name: str, 
@@ -152,17 +181,6 @@ def process_dataset(dataset: pd.DataFrame,
     # and the name of that metadata in the prompt
     # metadata = ['Page']
     return [ob.render(prompt) for ob in obs], [ob.y for ob in obs]
-
-# Find the indices of the first and last non-NaN values
-def remove_leading_trailing_nans(array):
-    mask = ~np.isnan(array)
-    if mask.any():
-        first_valid_index = np.argmax(mask)
-        last_valid_index = len(mask) - np.argmax(mask[::-1]) - 1
-        return array[first_valid_index:last_valid_index + 1]
-    else:
-        # If the array is entirely NaNs, return an empty array
-        return np.array([], dtype=array.dtype)
 
 def process_univariate(series, prompt_name, window_size, target_size, **kwargs):
     """

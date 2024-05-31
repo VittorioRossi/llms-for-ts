@@ -4,8 +4,8 @@ experiments:
     dataset_name: 'M4-month'
     target_size: 1
     window_size: 15
-    batch_size: 128
-    chunk_size: 5
+    batch_size: 64
+    chunk_size: 10
     prompt_name: 'base'
     limit_obs: 50000
     univariate: True
@@ -13,8 +13,8 @@ experiments:
     dataset_name: 'M4-week'
     target_size: 1
     window_size: 15
-    batch_size: 128
-    chunk_size: 5
+    batch_size: 64
+    chunk_size: 10
     prompt_name: 'base'
     limit_obs: 50000
     univariate: True
@@ -22,8 +22,8 @@ experiments:
     dataset_name: 'M4-quarter'
     target_size: 1
     window_size: 15
-    batch_size: 128
-    chunk_size: 5
+    batch_size: 64
+    chunk_size: 10
     prompt_name: 'base'
     limit_obs: 50000
     univariate: True
@@ -31,8 +31,8 @@ experiments:
     dataset_name: 'M5'
     target_size: 1
     window_size: 15
-    batch_size: 128
-    chunk_size: 5
+    batch_size: 64
+    chunk_size: 10
     prompt_name: 'base'
     limit_obs: 50000
     univariate: True
@@ -40,8 +40,8 @@ experiments:
     dataset_name: 'GWT'
     target_size: 1
     window_size: 15
-    batch_size: 128
-    chunk_size: 5
+    batch_size: 64
+    chunk_size: 10
     prompt_name: 'base'
     limit_obs: 50000
     univariate: True
