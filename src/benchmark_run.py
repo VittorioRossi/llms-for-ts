@@ -18,7 +18,7 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger(__name__)
 
 def run_experiment(model_name, dataset_name, prompt_name, window_size, target_size, batch_size=64, chunk_size=10, preds_path=None, univariate=False, limit_obs=None):
-    model_name_clean = model_name.split('/')[1]
+    model_name_clean = model_name.split('/')[1] if '/' in model_name else model_name
     run_name = f'{model_name_clean}_{dataset_name}_{prompt_name}_{window_size}_{target_size}'
     # check if dataset_name is in DATASET_LOADERS
     if dataset_name not in DATASET_LOADERS:
@@ -110,7 +110,7 @@ def main(config_path):
         limit_obs = experiment.get('limit_obs', 50_000)
 
     
-        model_name_clean = model_name.split('/')[1]
+        model_name_clean = model_name.split('/')[1] if '/' in model_name else model_name
         run_name = f"{model_name_clean}_{dataset_name}_{prompt_name}_{window_size}_{target_size}"
         if dataset_name == 'all':
             for dataset_name in DATASET_LOADERS.keys():
