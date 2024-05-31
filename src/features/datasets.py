@@ -20,7 +20,7 @@ def load_cached_data(cache_path):
     with open(cache_path, 'r') as f:
         data = f.readlines()
     X, y = zip(*[line.strip().split(',') for line in data])
-    return np.array(X, dtype=float), np.array(y, dtype=float)
+    return X, np.array(y, dtype=float)
 
 class Dataset(ABC):
     @abstractmethod
