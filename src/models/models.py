@@ -64,7 +64,8 @@ class HuggingFaceLLM(LLM):
     def load_model(self, model_name, token):
         # Load the model with appropriate class
         if 'bert' in model_name.lower():
-            return BertLMHeadModel.from_pretrained(
+            from transformers import BertModel
+            return BertModel.from_pretrained(
                 model_name,
                 cache_dir="models",
                 torch_dtype="auto",
@@ -82,7 +83,9 @@ class HuggingFaceLLM(LLM):
     def load_tokenizer(self, model_name, token):
         tokenizer_kwargs = {}
         if 'bert' in model_name.lower():
+            from transformers import BertTokenizer
             tokenizer_kwargs['padding_side'] = 'left'
+            return BertTokenizer.from_pretrained('bert-base-uncased', use_auth_token=token, **tokenizer_kwargs)
         return AutoTokenizer.from_pretrained(model_name, use_auth_token=token, **tokenizer_kwargs)
 
     def tokenize_inputs(self, tokenizer, texts):
