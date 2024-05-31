@@ -49,6 +49,7 @@ def run_experiment(model_name, dataset_name, prompt_name, window_size, target_si
         model = HuggingFaceLLM(model_name, example_output=dataset.example_output)
     except Exception as e:
         logger.error(f'Model {model_name} not found. Please check the model name and try again.')
+        logger.error(e)
         return
 
     logger.info('Running inference')
