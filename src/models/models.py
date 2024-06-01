@@ -105,10 +105,8 @@ class HuggingFaceLLM(LLM):
 
         results = []
         for text, generated_text in zip(texts, generated_texts):
-            print(generated_text)
             start_idx = len(text)
             prediction = generated_text[start_idx:]
-            print(prediction)
             preds = clean_pred(prediction, target_size)
             results.append(preds)
 

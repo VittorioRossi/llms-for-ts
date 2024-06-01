@@ -63,7 +63,7 @@ def run_experiment(model_name, dataset_name, prompt_name, window_size, target_si
         prediction = model.generate(observation[0])
         preds.extend(prediction)
         true.extend(observation[1])
-        
+        print(preds)
 
         if n_batches == num_bateches:
             break
@@ -72,7 +72,7 @@ def run_experiment(model_name, dataset_name, prompt_name, window_size, target_si
 
     preds = np.array(preds).reshape(-1, target_size).astype(float)
     true = np.array(true).reshape(-1, target_size).astype(float)
-    
+
     if preds_path:
         logger.info(f'Saving predictions to {preds_path}')
         saving_path = Path(preds_path) / f'{run_name}.npy'
