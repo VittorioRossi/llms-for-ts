@@ -79,9 +79,11 @@ class HuggingFaceLLM(LLM):
 
         results = []
         for text, generated_text in zip(texts, generated_texts):
-            start_idx = len(text)
-            prediction = generated_text[start_idx:]
-            preds = clean_pred(prediction, target_size)
+
+            if text in generated_text:
+                generated_text = generated_text[len(text):]
+            
+            preds = clean_pred(generated_text, target_size)
             if np.isnan(preds).any():
                 print(f"Failed to convert prediction '{generated_text}' to float")
 
