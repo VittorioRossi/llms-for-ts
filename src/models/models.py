@@ -34,6 +34,7 @@ class HuggingFaceLLM(LLM):
             inputs = self.tokenize_inputs(tokenizer, texts)
             outputs = self.generate_outputs(model, tokenizer, inputs, max_new_tok)
             results = self.decode_outputs(tokenizer, texts, outputs, target_size=target_size)
+            print(results)
             return results
 
         return gen
