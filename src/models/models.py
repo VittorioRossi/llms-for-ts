@@ -34,7 +34,6 @@ class HuggingFaceLLM(LLM):
             inputs = self.tokenize_inputs(tokenizer, texts)
             outputs = self.generate_outputs(model, tokenizer, inputs, max_new_tok)
             results = self.decode_outputs(tokenizer, texts, outputs, target_size=target_size)
-            print(results)
             return results
 
         return gen
@@ -122,14 +121,23 @@ def compute_new_tokens(target_size, example_output, tokenizer):
     example_tokens = tokenizer(example_output, add_special_tokens=False)['input_ids']
     return target_size * len(example_tokens)
 
-def clean_pred(pred:str, target_size:int):
-    # Transform the predicted tokens in a float
-    pred = pred.split(" ")[:target_size]
+def clean_pred(pred: str, target_size: int):
+    # Split the predicted string into tokens
+    tokens = pred.strip().split()[:target_size]
+
+    # Initialize the result list
     res = []
-    for el in pred:
+
+    for token in tokens:
         try:
-            res.append(float(el))
-        except:
+            # Attempt to convert each token to a float
+            res.append(float(token))
+        except ValueError:
+            # If conversion fails, append np.nan
             res.append(np.nan)
+
+    # If the number of tokens is less than target_size, append np.nan to the result
+    while len(res) < target_size:
+        res.append(np.nan)
 
     return res
