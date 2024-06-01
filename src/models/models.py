@@ -42,43 +42,17 @@ class HuggingFaceLLM(LLM):
         return self.generator(batch)
 
     def load_model(self, model_name, token):
-        # Load the model with appropriate class
-        if 't5' in model_name.lower():
-            return T5ForConditionalGeneration.from_pretrained(
-                model_name,
-                cache_dir="models",
-                torch_dtype="auto",
-                token=token
-            ).to(self.device)
-        elif 'pegasus' in model_name.lower():
-            return PegasusForConditionalGeneration.from_pretrained(
-                model_name,
-                cache_dir="models",
-                torch_dtype="auto",
-                token=token
-                ).to(self.device)
-        elif 'bigbird' in model_name.lower():
-            return BigBirdPegasusForConditionalGeneration.from_pretrained(
-                model_name,
-                cache_dir="models",
-                torch_dtype="auto",
-                token=token
-                ).to(self.device)
-        else:
-            return AutoModelForCausalLM.from_pretrained(
-                model_name,
-                cache_dir="models",
-                torch_dtype="auto",
-                token=token
-            ).to(self.device)
+        return AutoModelForCausalLM.from_pretrained(
+            model_name,
+            cache_dir="models",
+            torch_dtype="auto",
+            token=token
+        ).to(self.device)
 
     def load_tokenizer(self, model_name, token):
         tokenizer_kwargs = {}
         if 'bert' in model_name.lower():
             tokenizer_kwargs['padding_side'] = 'left'
-        elif 'bigbird' in model_name.lower():
-            return PegasusTokenizer.from_pretrained(model_name, token=token, cache_dir="models")
-
         return AutoTokenizer.from_pretrained(model_name, token=token, **tokenizer_kwargs)
 
     def tokenize_inputs(self, tokenizer, texts):
