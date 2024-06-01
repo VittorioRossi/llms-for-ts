@@ -89,7 +89,7 @@ class HuggingFaceLLM(LLM):
         return model.generate(
             input_ids=inputs['input_ids'],
             attention_mask=inputs['attention_mask'],
-            max_new_tokens=max_new_tokens*2,
+#            max_new_tokens=max_new_tokens*2,
             pad_token_id=tokenizer.pad_token_id
         )
 
