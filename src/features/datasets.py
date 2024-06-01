@@ -21,7 +21,7 @@ def load_cached_data(cache_path, batch_size=64):
         data = f.readlines()
     X, y = zip(*[line.strip().split(',') for line in data])
     X = list(X)
-    y = np.array(y, dtype=float)
+    y = np.array(y).astype(float)
     return utils.create_batches(X, y, batch_size)
 
 class Dataset(ABC):
