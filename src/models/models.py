@@ -99,10 +99,13 @@ class HuggingFaceLLM(LLM):
         torch.cuda.empty_cache()
 
         results = []
+        print(generated_texts)
         for text, generated_text in zip(texts, generated_texts):
             start_idx = len(text)
             prediction = generated_text[start_idx:]
+            print(prediction)
             preds = clean_pred(prediction, target_size)
+            print(preds)
             results.append(preds)
 
         return results
