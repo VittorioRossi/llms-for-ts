@@ -1,5 +1,6 @@
 import torch
-from transformers import AutoModel, AutoTokenizer, T5ForConditionalGeneration, pipeline
+from transformers import AutoModel, AutoTokenizer, T5ForConditionalGeneration
+from transformers import BigBirdPegasusForConditionalGeneration, PegasusTokenizer
 from abc import ABC, abstractmethod
 import os
 import numpy as np
@@ -13,19 +14,6 @@ class LLM(ABC):
     @abstractmethod
     def generate(self, batch: list[str]) -> str:
         pass
-
-class MaskedLM(LLM):
-    def __init__(self, model, target_size=1, **kwargs):
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.generator = self.setup_generator(model, target_size)
-
-        
-    def setup_generator(self, model_name, target_size):
-        # load the model with the pipeline and the fill-mask config
-        return pipeline("fill-mask", model=model_name, device = self.device)
-    
-    def generate(self, batch) -> str:
-        return 
 
 
 class HuggingFaceLLM(LLM):
@@ -61,6 +49,13 @@ class HuggingFaceLLM(LLM):
                 torch_dtype="auto",
                 use_auth_token=token
             ).to(self.device)
+        elif 'bigbird' in model_name.lower():
+            return BigBirdPegasusForConditionalGeneration.from_pretrained(
+                model_name,
+                cache_dir="models",
+                torch_dtype="auto",
+                use_auth_token=token
+                ).to(self.device)
         else:
             return AutoModel.from_pretrained(
                 model_name,
@@ -73,6 +68,9 @@ class HuggingFaceLLM(LLM):
         tokenizer_kwargs = {}
         if 'bert' in model_name.lower():
             tokenizer_kwargs['padding_side'] = 'left'
+        elif 'bigbird' in model_name.lower():
+            return PegasusTokenizer.from_pretrained(model_name, use_auth_token=token, cache_dir="models")
+
         return AutoTokenizer.from_pretrained(model_name, use_auth_token=token, **tokenizer_kwargs)
 
     def tokenize_inputs(self, tokenizer, texts):
