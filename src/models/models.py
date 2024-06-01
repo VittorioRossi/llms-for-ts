@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoModel, AutoTokenizer, T5ForConditionalGeneration
+from transformers import AutoModelForCausalLM, AutoTokenizer, T5ForConditionalGeneration
 from transformers import BigBirdPegasusForConditionalGeneration, PegasusTokenizer
 from transformers import PegasusForConditionalGeneration
 from abc import ABC, abstractmethod
@@ -65,7 +65,7 @@ class HuggingFaceLLM(LLM):
                 token=token
                 ).to(self.device)
         else:
-            return AutoModel.from_pretrained(
+            return AutoModelForCausalLM.from_pretrained(
                 model_name,
                 cache_dir="models",
                 torch_dtype="auto",
