@@ -177,13 +177,12 @@ class M5Dataset(Dataset):
             'target_size': kwargs.get('target_size', 1),
             'window_size': kwargs.get('window_size', 24),
             'ts_features': kwargs.get('ts_features', ['d']),
-            'metadata':  kwargs.get('metadata', ['item_id', 'dept_id', 'cat_id', 'store_id', 'state_id']),
+            'metadata':  kwargs.get('metadata', ["id", 'item_id', 'dept_id', 'cat_id', 'store_id', 'state_id']),
         }
 
         metadata = config.get('metadata')
         for chunk in chunks:
             chunk = chunk.melt(id_vars=metadata, var_name='d', value_name='target')
-            print(chunk)
             chunk = chunk.astype({'target':"float"})
             if merge_data:
                 chunk = self._merge_metadata(chunk)
