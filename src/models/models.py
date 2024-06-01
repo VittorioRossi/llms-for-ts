@@ -48,28 +48,28 @@ class HuggingFaceLLM(LLM):
                 model_name,
                 cache_dir="models",
                 torch_dtype="auto",
-                use_auth_token=token
+                token=token
             ).to(self.device)
         elif 'pegasus' in model_name.lower():
             return PegasusForConditionalGeneration.from_pretrained(
                 model_name,
                 cache_dir="models",
                 torch_dtype="auto",
-                use_auth_token=token
+                token=token
                 ).to(self.device)
         elif 'bigbird' in model_name.lower():
             return BigBirdPegasusForConditionalGeneration.from_pretrained(
                 model_name,
                 cache_dir="models",
                 torch_dtype="auto",
-                use_auth_token=token
+                token=token
                 ).to(self.device)
         else:
             return AutoModel.from_pretrained(
                 model_name,
                 cache_dir="models",
                 torch_dtype="auto",
-                use_auth_token=token
+                token=token
             ).to(self.device)
 
     def load_tokenizer(self, model_name, token):
@@ -77,9 +77,9 @@ class HuggingFaceLLM(LLM):
         if 'bert' in model_name.lower():
             tokenizer_kwargs['padding_side'] = 'left'
         elif 'bigbird' in model_name.lower():
-            return PegasusTokenizer.from_pretrained(model_name, use_auth_token=token, cache_dir="models")
+            return PegasusTokenizer.from_pretrained(model_name, token=token, cache_dir="models")
 
-        return AutoTokenizer.from_pretrained(model_name, use_auth_token=token, **tokenizer_kwargs)
+        return AutoTokenizer.from_pretrained(model_name, token=token, **tokenizer_kwargs)
 
     def tokenize_inputs(self, tokenizer, texts):
         return tokenizer(
@@ -89,7 +89,7 @@ class HuggingFaceLLM(LLM):
             truncation=True
         ).to(self.device)
 
-    def generate_outputs(self, model, tokenizer, inputs, **kwargs):
+    def generate_outputs(self, model, tokenizer, inputs, max_new_tokens):
         model.to(self.device)
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
         return model.generate(
