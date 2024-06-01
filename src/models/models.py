@@ -42,11 +42,16 @@ class HuggingFaceLLM(LLM):
         return self.generator(batch)
 
     def load_model(self, model_name, token):
+        model_kwargs = {}
+        if 'bert' in model_name.lower():
+            model_kwargs['is_decoder'] = True
+        
         return AutoModelForCausalLM.from_pretrained(
             model_name,
             cache_dir="models",
             torch_dtype="auto",
-            token=token
+            token=token,
+            **model_kwargs
         ).to(self.device)
 
     def load_tokenizer(self, model_name, token):
