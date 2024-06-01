@@ -1,7 +1,7 @@
 results_path: '/content/gdrive/MyDrive/tesi'
 experiments:
     - model_name: 'mistralai/Mistral-7B-Instruct-v0.3'
-      dataset_name: 'M5'
+      dataset_name: 'CT'
       target_size: 1
       window_size: 15
       batch_size: 32
@@ -9,7 +9,7 @@ experiments:
       prompt_name: 'base'
       limit_obs: 64
     - model_name: 'meta-llama/Meta-Llama-3-8B'
-      dataset_name: 'M5'
+      dataset_name: 'CT'
       target_size: 1
       window_size: 15
       batch_size: 32
@@ -17,7 +17,7 @@ experiments:
       prompt_name: 'base'
       limit_obs: 64
     - model_name: 'mistralai/Mistral-7B-Instruct-v0.3'
-      dataset_name: 'M5'
+      dataset_name: 'CT'
       target_size: 1
       window_size: 15
       batch_size: 32
@@ -25,7 +25,7 @@ experiments:
       prompt_name: 'base'
       limit_obs: 64
     - model_name: 'xai-org/grok-1'
-      dataset_name: 'M5'
+      dataset_name: 'CT'
       target_size: 1
       window_size: 15
       batch_size: 32

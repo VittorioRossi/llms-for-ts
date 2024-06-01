@@ -5,7 +5,7 @@ import numpy as np
 from . import utils
 from pathlib import Path
 
-def build_cache_path(cache_folder, window_size, target_size,  prompt_name= '', **kwargs):
+def build_cache_path(cache_folder, window_size, target_size,  prompt_name='', **kwargs):
     return Path(cache_folder) / f'{prompt_name}_{window_size}_{target_size}.csv'
 
 def cache_dataset(X, y, cache_folder, **kwargs):
@@ -43,7 +43,7 @@ class CTDataset(Dataset):
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines()
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines()
         X = [x.replace(',', '') for x in X]
-        cache_dataset(X, y, self.cache_folder, **kwargs)
+        cache_dataset(X, y, self.cache_folder,promt_name=promt_name, **kwargs)
         batches = utils.create_batches(X, y, batch_size)
         return batches # this is a generator
 
@@ -61,7 +61,7 @@ class SGDataset(Dataset):
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines()
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines()
         X = [x.replace(',', '') for x in X]
-        cache_dataset(X, y, self.cache_folder, **kwargs)
+        cache_dataset(X, y, self.cache_folder, promt_name=promt_name, **kwargs)
         batches = utils.create_batches(X, y, batch_size)
         return batches # this is a generator
     
@@ -122,7 +122,7 @@ class M4Dataset(Dataset):
         for chunk in chunks:
             chunk = chunk.melt(id_vars=['V1'], var_name='d', value_name='target')
             X,y = utils.process_dataset(chunk, promt_name, **config)
-            cache_dataset(X, y, self.cache_folder, **config)
+            cache_dataset(X, y, self.cache_folder,promt_name=promt_name, **config)
             for batch in utils.create_batches(X, y, batch_size):
                 yield batch
 
@@ -188,7 +188,7 @@ class M5Dataset(Dataset):
                 chunk = self._merge_metadata(chunk)
             
             X, y = utils.process_dataset(chunk, promt_name, **config)
-            cache_dataset(X, y, self.cache_folder, **config)
+            cache_dataset(X, y, self.cache_folder,promt_name=promt_name, **config)
 
             for batch in  utils.create_batches(X, y, batch_size):
                 yield batch
@@ -219,7 +219,7 @@ class GWTDataset(Dataset):
         for chunk in chunks:
             chunk = chunk.melt(id_vars=['Page'], var_name='d', value_name='target').astype({'d': 'str', 'target':"float"})
             X, y = utils.process_dataset(chunk, promt_name, **config)
-            cache_dataset(X, y, self.cache_folder, **config)
+            cache_dataset(X, y, self.cache_folder,promt_name=promt_name, **config)
             for batch in utils.create_batches(X,y, batch_size):
                 yield batch
 
