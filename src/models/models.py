@@ -5,19 +5,6 @@ import os
 import numpy as np
 
 
-def set_pad_token_if_missing(tokenizer):
-    if tokenizer.pad_token is None:
-        tokenizer.add_special_tokens({'pad_token': '[PAD]'})
-    return tokenizer
-
-def compute_new_tokens(target_size, example_output, tokenizer):
-    # Tokenize the original input text to find its length
-    original_input_ids = tokenizer(example_output, add_special_tokens=False)['input_ids']
-    original_input_length = len(original_input_ids)
-
-    return original_input_length*target_size
-
-
 class LLM(ABC):
     @abstractmethod
     def __init__(self):
@@ -40,9 +27,9 @@ class HuggingFaceLLM(LLM):
         tokenizer = set_pad_token_if_missing(tokenizer)
         max_new_tok = compute_new_tokens(target_size, example_output, tokenizer)
 
-        def gen(texts, max_new_tokens=max_new_tok):
+        def gen(texts):
             inputs = self.tokenize_inputs(tokenizer, texts)
-            outputs = self.generate_outputs(model, tokenizer, inputs, max_new_tokens)
+            outputs = self.generate_outputs(model, tokenizer, inputs, max_new_tok)
             results = self.decode_outputs(tokenizer, texts, outputs, target_size=target_size)
             return results
 
@@ -54,7 +41,6 @@ class HuggingFaceLLM(LLM):
     def load_model(self, model_name, token):
         # Load the model with appropriate class
         if 'bert' in model_name.lower():
-            from transformers import BertModel
             return BertLMHeadModel.from_pretrained(
                 model_name,
                 cache_dir="models",
@@ -90,7 +76,7 @@ class HuggingFaceLLM(LLM):
         return model.generate(
             input_ids=inputs['input_ids'],
             attention_mask=inputs['attention_mask'],
-            max_new_tokens=max_new_tokens,
+            max_new_tokens=max_new_tokens*2,
             pad_token_id=tokenizer.pad_token_id
         )
 
@@ -99,13 +85,10 @@ class HuggingFaceLLM(LLM):
         torch.cuda.empty_cache()
 
         results = []
-        print(generated_texts)
         for text, generated_text in zip(texts, generated_texts):
             start_idx = len(text)
             prediction = generated_text[start_idx:]
-            print(prediction)
             preds = clean_pred(prediction, target_size)
-            print(preds)
             results.append(preds)
 
         return results
