@@ -39,7 +39,7 @@ class HuggingFaceLLM(LLM):
         return gen
     
     def generate(self, batch):
-        return self.generator(batch)[0]
+        return self.generator(batch)
 
     def load_model(self, model_name, token):
         # Load the model with appropriate class
