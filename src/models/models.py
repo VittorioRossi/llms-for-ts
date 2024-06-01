@@ -30,7 +30,7 @@ class HuggingFaceLLM(LLM):
         tokenizer = set_pad_token_if_missing(tokenizer)
         max_new_tok = compute_new_tokens(target_size, example_output, tokenizer)
 
-        def gen(texts):
+        def gen(texts, **kwargs):
             inputs = self.tokenize_inputs(tokenizer, texts)
             outputs = self.generate_outputs(model, tokenizer, inputs, max_new_tok)
             results = self.decode_outputs(tokenizer, texts, outputs, target_size=target_size)
@@ -89,7 +89,7 @@ class HuggingFaceLLM(LLM):
             truncation=True
         ).to(self.device)
 
-    def generate_outputs(self, model, tokenizer, inputs):
+    def generate_outputs(self, model, tokenizer, inputs, **kwargs):
         model.to(self.device)
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
         return model.generate(
