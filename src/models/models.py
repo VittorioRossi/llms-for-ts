@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoModel, AutoTokenizer, BertLMHeadModel
+from transformers import AutoModel, AutoTokenizer, T5ForConditionalGeneration, pipeline
 from abc import ABC, abstractmethod
 import os
 import numpy as np
@@ -11,8 +11,22 @@ class LLM(ABC):
         pass
 
     @abstractmethod
-    def generate(self, prompt: str) -> str:
+    def generate(self, batch: list[str]) -> str:
         pass
+
+class MaskedLM(LLM):
+    def __init__(self, model, target_size=1, **kwargs):
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.generator = self.setup_generator(model, target_size)
+
+        
+    def setup_generator(self, model_name, target_size):
+        # load the model with the pipeline and the fill-mask config
+        return pipeline("fill-mask", model=model_name, device = self.device)
+    
+    def generate(self, batch) -> str:
+        return 
+
 
 class HuggingFaceLLM(LLM):
     def __init__(self, model: str, example_output="00.0", target_size=1):
@@ -40,8 +54,8 @@ class HuggingFaceLLM(LLM):
 
     def load_model(self, model_name, token):
         # Load the model with appropriate class
-        if 'bert' in model_name.lower():
-            return BertLMHeadModel.from_pretrained(
+        if 't5' in model_name.lower():
+            return T5ForConditionalGeneration.from_pretrained(
                 model_name,
                 cache_dir="models",
                 torch_dtype="auto",
