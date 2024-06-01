@@ -182,7 +182,7 @@ class M5Dataset(Dataset):
 
         metadata = config.get('metadata')
         for chunk in chunks:
-            chunk = chunk.melt(id_vars=metadata, var_name='d', value_name='target')
+            chunk = chunk.melt(id_vars=metadata, var_name='d', value_name='target').astype({'target':"float"})
 
             if merge_data:
                 chunk = self._merge_metadata(chunk)

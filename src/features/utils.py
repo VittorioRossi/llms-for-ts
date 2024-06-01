@@ -118,7 +118,7 @@ def _create_observations_w_ft_and_meta(df: pd.DataFrame, prompt:Template, target
         X_fin.append(prompt.render(data=X, metadata=mt))
         y_fin.append(list(np.array(y, dtype=float).flatten()))
     
-    return X_fin, y_fin, mt
+    return X_fin, y_fin
 
 # Find the indices of the first and last non-NaN values
 def remove_leading_trailing_nans(array):
@@ -165,7 +165,7 @@ def process_dataset(dataset: pd.DataFrame,
         assert all([meta in dataset.columns for meta in metadata]), "metadata must be a list of columns in the dataset"
         #the metadata specifies the object 
         for group in dataset.groupby(metadata):
-            X_group, y_group, mt_group = _create_observations_w_ft_and_meta(group[1], 
+            X_group, y_group = _create_observations_w_ft_and_meta(group[1], 
                                                                             prompt,
                                                                             target, 
                                                                             ts_features=ts_features, 
@@ -175,7 +175,7 @@ def process_dataset(dataset: pd.DataFrame,
             X.extend(X_group)
             y.extend(y_group)
     else:
-        X, y, _ = _create_observations_w_ft_and_meta(dataset, 
+        X, y = _create_observations_w_ft_and_meta(dataset, 
                                                      prompt,
                                                      target, 
                                                     ts_features=ts_features, 
