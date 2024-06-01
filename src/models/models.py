@@ -1,6 +1,7 @@
 import torch
 from transformers import AutoModel, AutoTokenizer, T5ForConditionalGeneration
 from transformers import BigBirdPegasusForConditionalGeneration, PegasusTokenizer
+from transformers import PegasusForConditionalGeneration
 from abc import ABC, abstractmethod
 import os
 import numpy as np
@@ -49,6 +50,13 @@ class HuggingFaceLLM(LLM):
                 torch_dtype="auto",
                 use_auth_token=token
             ).to(self.device)
+        elif 'pegasus' in model_name.lower():
+            return PegasusForConditionalGeneration.from_pretrained(
+                model_name,
+                cache_dir="models",
+                torch_dtype="auto",
+                use_auth_token=token
+                ).to(self.device)
         elif 'bigbird' in model_name.lower():
             return BigBirdPegasusForConditionalGeneration.from_pretrained(
                 model_name,
@@ -81,7 +89,7 @@ class HuggingFaceLLM(LLM):
             truncation=True
         ).to(self.device)
 
-    def generate_outputs(self, model, tokenizer, inputs, max_new_tokens):
+    def generate_outputs(self, model, tokenizer, inputs):
         model.to(self.device)
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
         return model.generate(

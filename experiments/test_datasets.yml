@@ -1,6 +1,6 @@
 results_path: '/content/gdrive/MyDrive/tesi'
 experiments:
-    - model_name: 'google-bert/bert-base-uncased'
+    - model_name: 'google/pegasus-xsum'
       dataset_name: 'all'
       target_size: 1
       window_size: 1
