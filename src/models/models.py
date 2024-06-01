@@ -45,8 +45,8 @@ class HuggingFaceLLM(LLM):
                 model_name,
                 cache_dir="models",
                 torch_dtype="auto",
-                use_auth_token=token
-
+                use_auth_token=token,
+                is_decoder=True
             ).to(self.device)
         else:
             return AutoModel.from_pretrained(
@@ -88,6 +88,7 @@ class HuggingFaceLLM(LLM):
         for text, generated_text in zip(texts, generated_texts):
             start_idx = len(text)
             prediction = generated_text[start_idx:]
+            print(prediction)
             preds = clean_pred(prediction, target_size)
             results.append(preds)
 
