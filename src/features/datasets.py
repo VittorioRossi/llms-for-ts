@@ -9,13 +9,12 @@ from pathlib import Path
 def build_cache_path(cache_folder, window_size, target_size,  prompt_name='', **kwargs):
     return Path(cache_folder) / f'{prompt_name}_{window_size}_{target_size}.csv'
 
-def cache_dataset(X, y, cache_folder, **kwargs):
-    cache_path = build_cache_path(cache_folder, **kwargs)
+def cache_dataset(X, y, cache_path):
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     
-    with open(cache_path, 'a+') as f:
+    with open(cache_path, 'a') as f:  # Use 'a' to append to the file
         for xi, yi in zip(X, y):
-            f.write(f'{xi},{yi}\n')
+            f.write(f'{xi},"{yi}"\n')  # Write yi as a quoted string
 
 def load_cached_data(cache_path, batch_size=64):
     with open(cache_path, 'r') as f:
@@ -47,7 +46,7 @@ class CTDataset(Dataset):
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines()
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines()
         X = [x.replace(',', '') for x in X]
-        cache_dataset(X, y, self.cache_folder,promt_name=promt_name, **kwargs)
+        cache_dataset(X, y, cache_path,promt_name=promt_name, **kwargs)
         batches = utils.create_batches(X, y, batch_size)
         return batches # this is a generator
 
@@ -65,7 +64,7 @@ class SGDataset(Dataset):
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines()
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines()
         X = [x.replace(',', '') for x in X]
-        cache_dataset(X, y, self.cache_folder, promt_name=promt_name, **kwargs)
+        cache_dataset(X, y, cache_path, promt_name=promt_name, **kwargs)
         batches = utils.create_batches(X, y, batch_size)
         return batches # this is a generator
     
@@ -95,7 +94,7 @@ class ETTHDataset(Dataset):
         }
         df = df.rename(columns={'OT': 'target'})
         X, y = utils.process_dataset(df, promt_name, **config)
-        cache_dataset(X, y, self.cache_folder, promt_name=promt_name, **config)
+        cache_dataset(X, y, cache_path, promt_name=promt_name, **config)
         return utils.create_batches(X, y, batch_size)
 
 class M4Dataset(Dataset):
@@ -127,7 +126,7 @@ class M4Dataset(Dataset):
             chunk = chunk.melt(id_vars=['V1'], var_name='d', value_name='target')
             chunk['target'] = chunk['target'].round(2)
             X,y = utils.process_dataset(chunk, promt_name, **config)
-            cache_dataset(X, y, self.cache_folder,promt_name=promt_name, **config)
+            cache_dataset(X, y, cache_path,promt_name=promt_name, **config)
             for batch in utils.create_batches(X, y, batch_size):
                 yield batch
 
@@ -193,7 +192,7 @@ class M5Dataset(Dataset):
                 chunk = self._merge_metadata(chunk)
             
             X, y = utils.process_dataset(chunk, promt_name, **config)
-            cache_dataset(X, y, self.cache_folder,promt_name=promt_name, **config)
+            cache_dataset(X, y, cache_path,promt_name=promt_name, **config)
 
             for batch in  utils.create_batches(X, y, batch_size):
                 yield batch
@@ -224,7 +223,7 @@ class GWTDataset(Dataset):
         for chunk in chunks:
             chunk = chunk.melt(id_vars=['Page'], var_name='d', value_name='target').astype({'d': 'str', 'target':"float"})
             X, y = utils.process_dataset(chunk, promt_name, **config)
-            cache_dataset(X, y, self.cache_folder,promt_name=promt_name, **config)
+            cache_dataset(X, y, cache_path,promt_name=promt_name, **config)
             for batch in utils.create_batches(X,y, batch_size):
                 yield batch
 
