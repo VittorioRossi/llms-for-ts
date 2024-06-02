@@ -14,8 +14,8 @@ def cache_dataset(X, y, cache_folder, **kwargs):
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     
     with open(cache_path, 'a+') as f:
-        for x, y in zip(X, y):
-            f.write(f'{x},{y}\n')
+        for xi, yi in zip(X, y):
+            f.write(f'{xi},{yi}\n')
 
 def load_cached_data(cache_path, batch_size=64):
     with open(cache_path, 'r') as f:
