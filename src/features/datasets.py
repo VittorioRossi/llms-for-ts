@@ -14,7 +14,7 @@ def cache_dataset(X, y, cache_path, **kwargs):
     
     with open(cache_path, 'a') as f:  # Use 'a' to append to the file
         for xi, yi in zip(X, y):
-            f.write(f'{xi},"{yi}"\n')  # Write yi as a quoted string
+            f.write(f'{xi},{yi}\n')  # Write yi as a quoted string
 
 def load_cached_data(cache_path, batch_size=64):
     with open(cache_path, 'r') as f:
@@ -22,11 +22,8 @@ def load_cached_data(cache_path, batch_size=64):
     X, y = zip(*[line.strip().split(',') for line in data])
     X = list(X)
 
-    try:
-        y = [ast.literal_eval(item.replace('"','')) for item in y]
-        y = np.array(y).astype(float)
-    except:
-        print(data, y)
+    y = [ast.literal_eval(item) for item in y]
+    y = np.array(y).astype(float)
 
     return utils.create_batches(X, y, batch_size)
 
