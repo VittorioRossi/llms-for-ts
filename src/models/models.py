@@ -162,7 +162,10 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
         def apply_chat_template(messages):
             return tokenizer(
                 tokenizer.eos_token.join([msg['content'] for msg in messages]),
-                return_tensors="pt"
+                return_tensors="pt",
+                padding=True,
+                truncation=True,
+                max_length=512
             )
         
         inputs_batch = [apply_chat_template(messages) for messages in batch_messages]
