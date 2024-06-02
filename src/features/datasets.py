@@ -22,7 +22,7 @@ def load_cached_data(cache_path, batch_size=64):
     X, y = zip(*[line.strip().split(',') for line in data])
     X = list(X)
 
-    y = [ast.literal_eval(item[1:-1]) for item in y]
+    y = [ast.literal_eval(item.replace('\'')) for item in y]
     y = np.array(y).astype(float)
 
     return utils.create_batches(X, y, batch_size)
