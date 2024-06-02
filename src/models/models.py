@@ -86,8 +86,7 @@ class HuggingFaceLLM(LLM):
 
     def load_tokenizer(self, model_name, token):
         tokenizer_kwargs = {}
-        if 'bert' in model_name.lower():
-            tokenizer_kwargs['padding_side'] = 'left'
+        tokenizer_kwargs['padding_side'] = 'left'
         return AutoTokenizer.from_pretrained(model_name, token=token, **tokenizer_kwargs)
 
     def tokenize_inputs(self, tokenizer, texts):
