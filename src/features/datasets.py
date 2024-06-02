@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import pandas as pd
 import numpy as np
+import ast
 
 from . import utils
 from pathlib import Path
@@ -21,6 +22,8 @@ def load_cached_data(cache_path, batch_size=64):
         data = f.readlines()
     X, y = zip(*[line.strip().split(',') for line in data])
     X = list(X)
+
+    y = [ast.literal_eval(item) for item in y]
     y = np.array(y).astype(float)
     return utils.create_batches(X, y, batch_size)
 
