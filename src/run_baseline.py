@@ -57,7 +57,7 @@ def run_experiment(model_name, dataset_name, window_size, target_size, batch_siz
     n_batches = 0
     for observation in tqdm(data_generator, total=num_bateches):
         cleaned_obs = [list(map(float, obs.split())) for obs in observation[0]]
-        if 'm4' in model_name: print(cleaned_obs)
+        if 'M4' in model_name: print(cleaned_obs)
         prediction = [model(cl, target_size) for cl in cleaned_obs]
 
         preds.extend(prediction)
