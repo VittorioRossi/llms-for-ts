@@ -174,7 +174,7 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
 
         results = []
         for messages, generated_text in zip(batch_messages, generated_texts):
-            original_text = tokenizer.eos_token.join([msg['content'] for msg in messages])
+            original_text = ' '.join([msg['content'] for msg in messages])
             generated_text = generated_text[len(original_text):].strip()
             preds = clean_pred(generated_text, target_size)
             if np.isnan(preds).any():
