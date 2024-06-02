@@ -56,7 +56,7 @@ def run_experiment(model_name, dataset_name, window_size, target_size, batch_siz
     num_bateches = limit_obs//batch_size
     n_batches = 0
     for observation in tqdm(data_generator, total=num_bateches):
-        cleaned_obs = np.array([float(obs) for obs in observation[0].split()])
+        cleaned_obs = [list(map(float, obs.split())) for obs in observation[0]]
         prediction = model(cleaned_obs, target_size)
         preds.extend(prediction)
         true.extend(observation[1])
