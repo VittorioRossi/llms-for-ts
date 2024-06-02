@@ -145,7 +145,7 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
             preproces_batch = self.apply_system_message(batch_messages, system_message=system_message)
             inputs_batch = self.tokenize_batch(tokenizer, preproces_batch)
             outputs = self.generate_outputs(model, tokenizer, inputs_batch, max_new_tok)
-            results = self.decode_outputs(tokenizer, batch_messages, outputs, target_size=target_size)
+            results = self.decode_outputs(tokenizer, preproces_batch, outputs, target_size=target_size)
             return results
 
         return gen
