@@ -18,9 +18,7 @@ def cache_dataset(X, y, cache_path, **kwargs):
 
 def load_cached_data(cache_path, batch_size=64):
     with open(cache_path, 'r') as f:
-        print(f'Loading data from {cache_path}')
         data = f.readlines()
-        print(f'Loaded {len(data)} samples')
 
     X, y = zip(*[line.strip().split(',') for line in data])
     X = list(X)
