@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from evaluation import evaluate
 from features import DATASET_LOADERS
 from models.baselines import mean_forecast, naive_forecast, ses_forecast
