@@ -18,7 +18,9 @@ def cache_dataset(X, y, cache_path, **kwargs):
 
 def load_cached_data(cache_path, batch_size=64):
     with open(cache_path, 'r') as f:
+        print(f'Loading data from {cache_path}')
         data = f.readlines()
+        print(f'Loaded {len(data)} samples')
 
     X, y = zip(*[line.strip().split(',') for line in data])
     X = list(X)
@@ -40,7 +42,7 @@ class CTDataset(Dataset):
         self.example_output = "000"
 
     def process(self, promt_name:str, batch_size:int, **kwargs):
-        cache_path = build_cache_path(self.cache_folder, **kwargs)
+        cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
         if self.cache_folder and cache_path.exists():
             return load_cached_data(cache_path, batch_size=batch_size)
 
@@ -58,7 +60,7 @@ class SGDataset(Dataset):
         self.example_output = "000"
 
     def process(self, promt_name, batch_size, **kwargs):
-        cache_path = build_cache_path(self.cache_folder, **kwargs)
+        cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
         if self.cache_folder and cache_path.exists():
             return load_cached_data(cache_path, batch_size=batch_size)
 
@@ -80,7 +82,7 @@ class ETTHDataset(Dataset):
         self.example_output = "00"
     
     def process(self, promt_name:str,batch_size:int, **kwargs):
-        cache_path = build_cache_path(self.cache_folder, **kwargs)
+        cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
         if self.cache_folder and cache_path.exists():
             return load_cached_data(cache_path, batch_size=batch_size)
         
@@ -109,7 +111,7 @@ class M4Dataset(Dataset):
         self.example_output = "00000.00"
     
     def process(self, promt_name:str, batch_size, chunksize = 1000, **kwargs):
-        cache_path = build_cache_path(self.cache_folder, **kwargs)
+        cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
         if self.cache_folder and cache_path.exists():
             return load_cached_data(cache_path, batch_size=batch_size)
         
@@ -166,7 +168,7 @@ class M5Dataset(Dataset):
         return df
     
     def process(self, promt_name:str, batch_size, chunksize=100, **kwargs):
-        cache_path = build_cache_path(self.cache_folder, **kwargs)
+        cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
         if self.cache_folder and cache_path.exists():
             return load_cached_data(cache_path, batch_size=batch_size)
         
@@ -209,7 +211,7 @@ class GWTDataset(Dataset):
         self.example_output = "0000"
     
     def process(self, promt_name:str, batch_size, chunksize = 1000, **kwargs):
-        cache_path = build_cache_path(self.cache_folder, **kwargs)
+        cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
         if self.cache_folder and cache_path.exists():
             return load_cached_data(cache_path, batch_size=batch_size)
         
