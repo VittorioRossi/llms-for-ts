@@ -1,10 +1,40 @@
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, T5ForConditionalGeneration
-from transformers import BigBirdPegasusForConditionalGeneration, PegasusTokenizer
-from transformers import PegasusForConditionalGeneration
+from transformers import AutoModelForCausalLM, AutoTokenizer
 from abc import ABC, abstractmethod
 import os
 import numpy as np
+
+def set_pad_token_if_missing(tokenizer):
+    if tokenizer.pad_token is None:
+        tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+    return tokenizer
+
+def compute_new_tokens(target_size, example_output, tokenizer):
+    example_tokens = tokenizer(example_output, add_special_tokens=False)['input_ids']
+    return target_size * len(example_tokens)
+
+def clean_pred(pred: str, target_size: int):
+    # Split the predicted string into tokens
+    tokens = pred.strip().split()[:target_size]
+
+    # Initialize the result list
+    res = []
+
+    for token in tokens:
+        try:
+            # Attempt to convert each token to a float
+            res.append(float(token))
+        except ValueError:
+            # If conversion fails, append np.nan
+            res.append(np.nan)
+
+    # If the number of tokens is less than target_size, append np.nan to the result
+    while len(res) < target_size:
+        res.append(np.nan)
+
+    return res
+
+
 
 
 class LLM(ABC):
@@ -97,32 +127,49 @@ class HuggingFaceLLM(LLM):
 
         return results
 
-def set_pad_token_if_missing(tokenizer):
-    if tokenizer.pad_token is None:
-        tokenizer.add_special_tokens({'pad_token': '[PAD]'})
-    return tokenizer
 
-def compute_new_tokens(target_size, example_output, tokenizer):
-    example_tokens = tokenizer(example_output, add_special_tokens=False)['input_ids']
-    return target_size * len(example_tokens)
+class HuggingFaceLLMChat(HuggingFaceLLM):
+    def __init__(self, model: str, example_output="00.0", target_size=1):
+        super().__init__(model, example_output, target_size)
 
-def clean_pred(pred: str, target_size: int):
-    # Split the predicted string into tokens
-    tokens = pred.strip().split()[:target_size]
+    def setup_generator(self, model_name, example_output="00.0", target_size=1):
+        token = os.environ.get("HUGGINGFACE_TOKEN")
+        model = self.load_model(model_name, token)
+        tokenizer = self.load_tokenizer(model_name, token)
 
-    # Initialize the result list
-    res = []
+        tokenizer = set_pad_token_if_missing(tokenizer)
+        max_new_tok = compute_new_tokens(target_size, example_output, tokenizer)
 
-    for token in tokens:
-        try:
-            # Attempt to convert each token to a float
-            res.append(float(token))
-        except ValueError:
-            # If conversion fails, append np.nan
-            res.append(np.nan)
+        def gen(batch_messages, **kwargs):
+            inputs_batch = self.tokenize_batch(tokenizer, batch_messages)
+            outputs = self.generate_outputs(model, tokenizer, inputs_batch, max_new_tok)
+            results = self.decode_outputs(tokenizer, batch_messages, outputs, target_size=target_size)
+            return results
 
-    # If the number of tokens is less than target_size, append np.nan to the result
-    while len(res) < target_size:
-        res.append(np.nan)
+        return gen
+    
+    def tokenize_batch(self, tokenizer, batch_messages):
+        def apply_chat_template(messages):
+            return tokenizer(
+                tokenizer.eos_token.join([msg['content'] for msg in messages]),
+                return_tensors="pt"
+            )
+        
+        inputs_batch = [apply_chat_template(messages) for messages in batch_messages]
+        return {key: torch.cat([inputs[key] for inputs in inputs_batch], dim=0).to(self.device) for key in inputs_batch[0]}
 
-    return res
+    def decode_outputs(self, tokenizer, batch_messages, outputs, target_size):
+        generated_texts = tokenizer.batch_decode(outputs, skip_special_tokens=True)
+        torch.cuda.empty_cache()
+
+        results = []
+        for messages, generated_text in zip(batch_messages, generated_texts):
+            original_text = tokenizer.eos_token.join([msg['content'] for msg in messages])
+            generated_text = generated_text[len(original_text):].strip()
+            preds = clean_pred(generated_text, target_size)
+            if np.isnan(preds).any():
+                print(f"Failed to convert prediction '{generated_text}' to float")
+
+            results.append(preds)
+
+        return results
