@@ -149,6 +149,8 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
             return results
 
         return gen
+    
+    
     def apply_system_message(self, batch_messages, system_message = "you are a time series forecasting model"):
         return [
             [
@@ -167,8 +169,14 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
                 truncation=True,
                 max_length=512
             )
-        
         inputs_batch = [apply_chat_template(messages) for messages in batch_messages]
+        max_length = max(inputs['input_ids'].shape[1] for inputs in inputs_batch)  # Get the max length in the batch
+        
+        # Ensure all inputs are padded to the max length
+        for inputs in inputs_batch:
+            inputs['input_ids'] = torch.nn.functional.pad(inputs['input_ids'], (0, max_length - inputs['input_ids'].shape[1]), value=tokenizer.pad_token_id)
+            inputs['attention_mask'] = torch.nn.functional.pad(inputs['attention_mask'], (0, max_length - inputs['attention_mask'].shape[1]), value=0)
+        
         return {key: torch.cat([inputs[key] for inputs in inputs_batch], dim=0).to(self.device) for key in inputs_batch[0]}
 
     def decode_outputs(self, tokenizer, batch_messages, outputs, target_size):
