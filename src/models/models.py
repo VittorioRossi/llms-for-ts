@@ -172,8 +172,9 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
         inputs_batch = [apply_chat_template(messages) for messages in batch_messages]
 
 
-        need_padding = all(inputs_batch[0]['input_ids'].shape[1] == inputs['input_ids'].shape[1] for inputs in inputs_batch)
-        if need_padding:
+        padded = all(inputs_batch[0]['input_ids'].shape[1] == inputs['input_ids'].shape[1] for inputs in inputs_batch)
+        
+        if not padded:
             max_length = max(inputs['input_ids'].shape[1] for inputs in inputs_batch)  # Get the max length in the batch
 
 
