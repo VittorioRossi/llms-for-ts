@@ -4,7 +4,7 @@ experiments:
     dataset_name: 'all'
     target_size: 1
     window_size: 15
-    batch_size: 128
+    batch_size: 64
     chunk_size: 10
     prompt_name: 'base'
     limit_obs: 50000

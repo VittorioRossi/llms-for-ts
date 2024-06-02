@@ -164,9 +164,9 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
             return tokenizer(
                 tokenizer.eos_token.join([msg['content'] for msg in messages]),
                 return_tensors="pt",
-                padding=True,
+                padding='max_length',
                 truncation=True,
-                max_length=512
+                max_length=256
             )
         inputs_batch = [apply_chat_template(messages) for messages in batch_messages]
         return {key: torch.cat([inputs[key] for inputs in inputs_batch], dim=0).to(self.device) for key in inputs_batch[0]}
