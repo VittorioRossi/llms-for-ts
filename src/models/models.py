@@ -141,13 +141,23 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
         max_new_tok = compute_new_tokens(target_size, example_output, tokenizer)
 
         def gen(batch_messages, **kwargs):
-            inputs_batch = self.tokenize_batch(tokenizer, batch_messages)
+            system_message = kwargs.get('system_message', "you are a time series forecasting model")
+            preproces_batch = self.apply_system_message(batch_messages, system_message=system_message)
+            inputs_batch = self.tokenize_batch(tokenizer, preproces_batch)
             outputs = self.generate_outputs(model, tokenizer, inputs_batch, max_new_tok)
             results = self.decode_outputs(tokenizer, batch_messages, outputs, target_size=target_size)
             return results
 
         return gen
-    
+    def apply_system_message(self, batch_messages, system_message = "you are a time series forecasting model"):
+        return [
+            [
+                {'role':'system', 'content':system_message},
+                {'role':'user', 'content':message}
+            ]
+            for message in batch_messages
+        ]
+
     def tokenize_batch(self, tokenizer, batch_messages):
         def apply_chat_template(messages):
             return tokenizer(
