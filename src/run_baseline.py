@@ -41,8 +41,7 @@ def run_experiment(model_name, dataset_name, window_size, target_size, batch_siz
                                     window_size=window_size, 
                                     target_size=target_size,
                                     batch_size=batch_size,
-                                    chunksize=chunk_size,
-                                    univariate=univariate)
+                                    chunksize=chunk_size,)
 
 
     logger.info('Loading model')
