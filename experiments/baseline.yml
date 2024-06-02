@@ -1,0 +1,6 @@
+results_path: '/content/gdrive/MyDrive/tesi'
+target_size: 1
+window_size: 15
+batch_size: 64
+chunk_size: 10
+limit_obs: 50000
