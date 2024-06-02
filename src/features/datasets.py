@@ -23,7 +23,7 @@ def load_cached_data(cache_path, batch_size=64):
     X = list(X)
 
     try:
-        y = [ast.literal_eval(item.replace('\'','')) for item in y]
+        y = [ast.literal_eval(item.replace('"','')) for item in y]
         y = np.array(y).astype(float)
     except:
         print(data, y)
