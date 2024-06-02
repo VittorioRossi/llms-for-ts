@@ -121,6 +121,7 @@ class M4Dataset(Dataset):
 
         for chunk in chunks:
             chunk = chunk.melt(id_vars=['V1'], var_name='d', value_name='target')
+            chunk['target'] = chunk['target'].round(2)
             X,y = utils.process_dataset(chunk, promt_name, **config)
             cache_dataset(X, y, self.cache_folder,promt_name=promt_name, **config)
             for batch in utils.create_batches(X, y, batch_size):
