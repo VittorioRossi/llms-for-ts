@@ -166,7 +166,7 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
                 return_tensors="pt",
                 padding='max_length',
                 truncation=True,
-                max_length=256
+                max_length=128
             )
         inputs_batch = [apply_chat_template(messages) for messages in batch_messages]
         return {key: torch.cat([inputs[key] for inputs in inputs_batch], dim=0).to(self.device) for key in inputs_batch[0]}
