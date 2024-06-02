@@ -113,7 +113,8 @@ class M4Dataset(Dataset):
     def process(self, promt_name:str, batch_size, chunksize = 1000, **kwargs):
         cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
         if self.cache_folder and cache_path.exists():
-            return load_cached_data(cache_path, batch_size=batch_size)
+            for batch in load_cached_data(cache_path, batch_size=batch_size):
+                yield batch
         
         chunks = pd.read_csv(self.df_path, chunksize=chunksize)
 
@@ -170,7 +171,8 @@ class M5Dataset(Dataset):
     def process(self, promt_name:str, batch_size, chunksize=100, **kwargs):
         cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
         if self.cache_folder and cache_path.exists():
-            return load_cached_data(cache_path, batch_size=batch_size)
+            for batch in load_cached_data(cache_path, batch_size=batch_size):
+                yield batch
         
         chunks = pd.read_csv(self.df_path, chunksize=chunksize)
         merge_data = kwargs.get('merge', False)
@@ -213,7 +215,8 @@ class GWTDataset(Dataset):
     def process(self, promt_name:str, batch_size, chunksize = 1000, **kwargs):
         cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
         if self.cache_folder and cache_path.exists():
-            return load_cached_data(cache_path, batch_size=batch_size)
+            for batch in load_cached_data(cache_path, batch_size=batch_size):
+                yield batch
         
         chunks = pd.read_csv(self.df_path, chunksize=chunksize)
         config = {
