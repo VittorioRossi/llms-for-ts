@@ -9,7 +9,7 @@ from pathlib import Path
 def build_cache_path(cache_folder, window_size, target_size,  prompt_name='', **kwargs):
     return Path(cache_folder) / f'{prompt_name}_{window_size}_{target_size}.csv'
 
-def cache_dataset(X, y, cache_path):
+def cache_dataset(X, y, cache_path, **kwargs):
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     
     with open(cache_path, 'a') as f:  # Use 'a' to append to the file
@@ -46,7 +46,7 @@ class CTDataset(Dataset):
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines()
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines()
         X = [x.replace(',', '') for x in X]
-        cache_dataset(X, y, cache_path,promt_name=promt_name, **kwargs)
+        cache_dataset(X, y, cache_path, **kwargs)
         batches = utils.create_batches(X, y, batch_size)
         return batches # this is a generator
 
