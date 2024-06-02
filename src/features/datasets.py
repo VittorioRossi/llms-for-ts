@@ -25,6 +25,8 @@ def load_cached_data(cache_path, batch_size=64):
 
     y = [ast.literal_eval(item) for item in y]
     y = np.array(y).astype(float)
+
+    print(f'Loaded {len(X)} samples from cache')
     return utils.create_batches(X, y, batch_size)
 
 class Dataset(ABC):
