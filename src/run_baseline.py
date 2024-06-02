@@ -76,6 +76,7 @@ def run_experiment(model_name, dataset_name, window_size, target_size, batch_siz
         saving_path.parent.mkdir(parents=True, exist_ok=True)
         np.save(saving_path, preds)
 
+    print(true, preds)
     logger.info('Evaluating model')
     eval = evaluate(true, preds)
     logger.info(eval)
