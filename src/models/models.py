@@ -103,17 +103,30 @@ class HuggingFaceLLM(LLM):
         return AutoTokenizer.from_pretrained(model_name, token=token, **tokenizer_kwargs)
 
     def tokenize_inputs(self, tokenizer, texts):
-        return tokenizer(
+        inputs_batch = tokenizer(
             texts,
             return_tensors="pt",
             padding=True,
             truncation=True,
             max_length=256,
-        ).to(self.device)
+        )
+
+        padded = all(inputs_batch[0]['input_ids'].shape[1] == inputs['input_ids'].shape[1] for inputs in inputs_batch)
+        
+        if not padded:
+            max_length = max(inputs['input_ids'].shape[1] for inputs in inputs_batch)  # Get the max length in the batch
+
+
+            # Ensure all inputs are padded to the max length on the left
+            for inputs in inputs_batch:
+                padding_length = max_length - inputs['input_ids'].shape[1]
+                inputs['input_ids'] = torch.nn.functional.pad(inputs['input_ids'], (padding_length, 0), value=tokenizer.pad_token_id)
+                inputs['attention_mask'] = torch.nn.functional.pad(inputs['attention_mask'], (padding_length, 0), value=0)
+
+        return {key: torch.cat([inputs[key] for inputs in inputs_batch], dim=0).to(self.device) for key in inputs_batch[0]}
+
 
     def generate_outputs(self, model, tokenizer, inputs, max_new_tokens):
-        model.to(self.device)
-        inputs = {k: v.to(self.device) for k, v in inputs.items()}
         return model.generate(
             input_ids=inputs['input_ids'],
             attention_mask=inputs['attention_mask'],
