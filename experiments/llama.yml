@@ -1,0 +1,10 @@
+results_path: '/content/gdrive/MyDrive/tesi'
+experiments: 
+  - model_name: 'meta-llama/Meta-Llama-3-8B'
+    dataset_name: 'all'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
+    chunk_size: 10
+    prompt_name: 'base'
+    limit_obs: 50000
