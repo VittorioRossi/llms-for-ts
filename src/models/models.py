@@ -3,6 +3,13 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from abc import ABC, abstractmethod
 import os
 import numpy as np
+import logging
+
+logging.basicConfig(level=logging.INFO, 
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+logger = logging.getLogger('models')
+
 
 def set_pad_token_if_missing(tokenizer):
     if tokenizer.pad_token is None:
@@ -63,7 +70,12 @@ class HuggingFaceLLM(LLM):
 
         def gen(texts, **kwargs):
             inputs = self.tokenize_inputs(tokenizer, texts)
-            outputs = self.generate_outputs(model, tokenizer, inputs, max_new_tok)
+            try:
+                outputs = self.generate_outputs(model, tokenizer, inputs, max_new_tok)
+            except Exception as e:
+                logger.error(f'Failed to generate outputs for model {model_name}. On input {texts} with error {e}. - Tokenizer input shape {inputs["input_ids"].shape} - Tokenizer attention mask shape {inputs["attention_mask"].shape}')
+                return [np.nan for _ in range(target_size)] * len(texts)
+            
             results = self.decode_outputs(tokenizer, texts, outputs, target_size=target_size)
             return results
 
@@ -146,7 +158,12 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
             system_message = kwargs.get('system_message', "you are a time series forecasting model")
             preproces_batch = self.apply_system_message(batch_messages, system_message=system_message)
             inputs_batch = self.tokenize_batch(tokenizer, preproces_batch)
-            outputs = self.generate_outputs(model, tokenizer, inputs_batch, max_new_tok)
+            try:
+                outputs = self.generate_outputs(model, tokenizer, inputs_batch, max_new_tok)
+            except Exception as e:
+                logger.error(f'Failed to generate outputs for model {model_name}. On input {batch_messages} with error {e}. - Tokenizer input shape {inputs_batch["input_ids"].shape} - Tokenizer attention mask shape {inputs_batch["attention_mask"].shape}')
+                return [np.nan for _ in range(target_size)] * len(batch_messages)
+            
             results = self.decode_outputs(tokenizer, preproces_batch, outputs, target_size=target_size)
             return results
 
