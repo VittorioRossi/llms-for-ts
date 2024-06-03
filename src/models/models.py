@@ -130,7 +130,7 @@ class HuggingFaceLLM(LLM):
 
 class HuggingFaceLLMChat(HuggingFaceLLM):
     def __init__(self, model: str, example_output="00.0", target_size=1, max_token_mutliplier=1):
-        super().__init__(model, example_output, target_size, max_token_mutliplier)
+        super().__init__(model, example_output, target_size, max_token_mutliplier=max_token_mutliplier)
 
     def setup_generator(self, model_name, example_output="00.0", target_size=1):
         token = os.environ.get("HUGGINGFACE_TOKEN")
