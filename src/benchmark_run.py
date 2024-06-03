@@ -23,7 +23,6 @@ def load_model(model_name, example_output, is_chat_model=True, **kwargs):
             logger.error(e)
             return
     else:
-        
         try:
             model = HuggingFaceLLM(model_name, example_output=example_output, max_token_mutliplier=max_token_mutliplier)
             return model
