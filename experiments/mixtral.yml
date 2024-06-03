@@ -1,6 +1,6 @@
 results_path: '/content/gdrive/MyDrive/tesi'
 experiments: 
-  - model_name: 'mistralai/Mistral-7B-Instruct-v0.3'
+  - model_name: 'mistralai/Mistral-7B-v0.3'
     dataset_name: 'all'
     target_size: 1
     window_size: 15
@@ -8,4 +8,3 @@ experiments:
     chunk_size: 10
     prompt_name: 'base'
     limit_obs: 50000
-    univariate: False
