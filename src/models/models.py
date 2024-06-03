@@ -95,7 +95,8 @@ class HuggingFaceLLM(LLM):
             texts,
             return_tensors="pt",
             padding=True,
-            truncation=True
+            truncation=True,
+            max_length=256,
         ).to(self.device)
 
     def generate_outputs(self, model, tokenizer, inputs, max_new_tokens):
