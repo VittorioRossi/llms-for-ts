@@ -9,3 +9,4 @@ experiments:
     prompt_name: 'base'
     max_token_mutliplier: 10
     limit_obs: 50000
+    is_chat_model: False
