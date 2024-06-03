@@ -7,4 +7,5 @@ experiments:
     batch_size: 64
     chunk_size: 10
     prompt_name: 'base'
+    max_token_mutliplier: 10
     limit_obs: 50000

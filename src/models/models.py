@@ -48,9 +48,10 @@ class LLM(ABC):
 
 
 class HuggingFaceLLM(LLM):
-    def __init__(self, model: str, example_output="00.0", target_size=1):
+    def __init__(self, model: str, example_output="00.0", target_size=1, max_token_mutliplier=1):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.generator = self.setup_generator(model, example_output, target_size)
+        self.max_token_mutliplier = max_token_mutliplier
 
     def setup_generator(self, model_name, example_output="00.0", target_size=1):
         token = os.environ.get("HUGGINGFACE_TOKEN")
@@ -58,7 +59,7 @@ class HuggingFaceLLM(LLM):
         tokenizer = self.load_tokenizer(model_name, token)
 
         tokenizer = set_pad_token_if_missing(tokenizer)
-        max_new_tok = compute_new_tokens(target_size, example_output, tokenizer)
+        max_new_tok = compute_new_tokens(target_size, example_output, tokenizer) * self.max_token_mutliplier
 
         def gen(texts, **kwargs):
             inputs = self.tokenize_inputs(tokenizer, texts)
@@ -128,8 +129,8 @@ class HuggingFaceLLM(LLM):
 
 
 class HuggingFaceLLMChat(HuggingFaceLLM):
-    def __init__(self, model: str, example_output="00.0", target_size=1):
-        super().__init__(model, example_output, target_size)
+    def __init__(self, model: str, example_output="00.0", target_size=1, max_token_mutliplier=1):
+        super().__init__(model, example_output, target_size, max_token_mutliplier)
 
     def setup_generator(self, model_name, example_output="00.0", target_size=1):
         token = os.environ.get("HUGGINGFACE_TOKEN")
@@ -137,7 +138,7 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
         tokenizer = self.load_tokenizer(model_name, token)
 
         tokenizer = set_pad_token_if_missing(tokenizer)
-        max_new_tok = compute_new_tokens(target_size, example_output, tokenizer)
+        max_new_tok = compute_new_tokens(target_size, example_output, tokenizer) * self.max_token_mutliplier
 
         def gen(batch_messages, **kwargs):
             system_message = kwargs.get('system_message', "you are a time series forecasting model")
