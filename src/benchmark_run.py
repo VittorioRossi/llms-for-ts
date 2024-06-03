@@ -11,12 +11,18 @@ import numpy as np
 from pathlib import Path
 import yaml
 
+logging.basicConfig(level=logging.INFO, 
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+logger = logging.getLogger(__name__)
+
 
 def load_model(model_name, example_output, is_chat_model=True, **kwargs):
     max_token_mutliplier = kwargs.get('max_token_mutliplier', 1)
     if is_chat_model:
         try:
             model = HuggingFaceLLMChat(model_name, example_output=example_output, max_token_mutliplier=max_token_mutliplier)
+            logger.info(f'Chat model {model_name} loaded')
             return model
         except Exception as e:
             logger.error(f'Model {model_name} not found. Please check the model name and try again.')
@@ -25,16 +31,12 @@ def load_model(model_name, example_output, is_chat_model=True, **kwargs):
     else:
         try:
             model = HuggingFaceLLM(model_name, example_output=example_output, max_token_mutliplier=max_token_mutliplier)
+            logger.info(f'Model {model_name} loaded')
             return model
         except Exception as e:
             logger.error(f'Model {model_name} not found. Please check the model name and try again.')
             logger.error(e)
             return
-
-logging.basicConfig(level=logging.INFO, 
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-logger = logging.getLogger(__name__)
 
 def run_experiment(model_name, dataset_name, prompt_name, window_size, target_size, batch_size=64, chunk_size=10, preds_path=None, univariate=False, limit_obs=None, is_chat_model=False, **kwargs):
     model_name_clean = model_name.split('/')[1] if '/' in model_name else model_name
@@ -145,7 +147,7 @@ def main(config_path):
                                        results_dir,
                                        univariate,
                                        limit_obs,
-                                       is_chat_model, 
+                                       is_chat_model=is_chat_model, 
                                        max_token_mutliplier=max_token_mutliplier)
                 saving_path = results_dir / (run_name + '.txt')
                 saving_path.parent.mkdir(parents=True, exist_ok=True)
@@ -163,6 +165,7 @@ def main(config_path):
                                    results_dir,
                                    univariate,
                                    limit_obs,
+                                   is_chat_model=is_chat_model,
                                    max_token_mutliplier=max_token_mutliplier)
 
             saving_path = results_dir / (run_name + '.txt')
