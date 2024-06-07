@@ -220,4 +220,3 @@ def create_batches(X, y, batch_size):
     else:
         for i in range(0, X.shape[0], batch_size):
             yield X[i:i + batch_size], y[i:i + batch_size]
-

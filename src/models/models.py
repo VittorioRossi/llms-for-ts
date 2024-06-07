@@ -42,8 +42,6 @@ def clean_pred(pred: str, target_size: int):
     return res
 
 
-
-
 class LLM(ABC):
     @abstractmethod
     def __init__(self):
@@ -111,22 +109,8 @@ class HuggingFaceLLM(LLM):
             truncation=True,
             max_length=256,
         )
-        
-        # Convert to the correct device
-        inputs = {k: v.to(self.device) for k, v in inputs.items()}
-        
-        # Check if all inputs are padded to the same length
-        padded = inputs['input_ids'].shape[1] == inputs['input_ids'].shape[1]
-
-        if not padded:
-            max_length = inputs['input_ids'].shape[1]
-            
-            # Ensure all inputs are padded to the max length
-            padding_length = max_length - inputs['input_ids'].shape[1]
-            inputs['input_ids'] = torch.nn.functional.pad(inputs['input_ids'], (padding_length, 0), value=tokenizer.pad_token_id)
-            inputs['attention_mask'] = torch.nn.functional.pad(inputs['attention_mask'], (padding_length, 0), value=0)
-
-        return inputs
+    
+        return {k: v.to(self.device) for k, v in inputs.items()}
 
     def generate_outputs(self, model, tokenizer, inputs, max_new_tokens):
         return model.generate(
@@ -199,7 +183,7 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
             return tokenizer(
                 tokenizer.eos_token.join([msg['content'] for msg in messages]),
                 return_tensors="pt",
-                padding=True,
+                padding='max_length',
                 truncation=True,
                 max_length=256
             )

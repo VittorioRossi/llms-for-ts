@@ -38,6 +38,7 @@ class CTDataset(Dataset):
         self.path = path
         self.cache_folder = cache_folder
         self.example_output = "000"
+        self.seasonalities = [366]
 
     def process(self, promt_name:str, batch_size:int, **kwargs):
         cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
@@ -56,6 +57,7 @@ class SGDataset(Dataset):
         self.path = path
         self.cache_folder = cache_folder
         self.example_output = "000"
+        self.seasonalities = [7]
 
     def process(self, promt_name, batch_size, **kwargs):
         cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
@@ -78,6 +80,7 @@ class ETTHDataset(Dataset):
         self.path = path
         self.cache_folder = cache_folder
         self.example_output = "00"
+        self.seasonalities = [24, 168] #daily and weekly
     
     def process(self, promt_name:str,batch_size:int, **kwargs):
         cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
@@ -102,11 +105,23 @@ class M4Dataset(Dataset):
     """
     M4Dataset is a dataset class that takes in a path to the M4 dataset and processes it.
     """
-    def __init__(self, path:str = '/data/raw/m4', cache_folder = 'data/processed/m4', train = True, **kwargs):
+    def __init__(self, path:str = '/data/raw/m4', cache_folder = 'data/processed/m4', name = 'weekly', train = True, **kwargs):
+        if not name in ['monthly', 'quarterly', 'weekly']:
+            raise ValueError("Name must be one of 'Monthly', 'Quarterly', 'Weekly'")
+
         self.path = path
         self.df_path = f'{self.path}/' + ('train.csv' if train else 'test.csv')
         self.cache_folder = cache_folder
         self.example_output = "00000.00"
+        self.seasonalities = self._compute_seasonality(name)
+
+    def _compute_seasonality(self, name):
+        if name == 'Weekly':
+            return [52]
+        elif name == 'Quarterly':
+            return [4]
+        elif name == 'Monthly':
+            return [12]
     
     def process(self, promt_name:str, batch_size, chunksize = 1000, **kwargs):
         cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
@@ -140,6 +155,7 @@ class M5Dataset(Dataset):
         self.path = path
         self.cache_folder = cache_folder
         self.example_output = "000"
+        self.seasonalities = [7, 28]
     
         self.df_path = f'{self.path}/' + ('sales_train_validation.csv' if train else 'sales_train_evaluation.csv')
 
