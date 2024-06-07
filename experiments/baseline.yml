@@ -1,6 +1,30 @@
 results_path: '/content/gdrive/MyDrive/tesi'
-target_size: 1
-window_size: 15
-batch_size: 64
-chunk_size: 10
-limit_obs: 50000
+experiments:
+  - dataset_name: 'CT'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
+  - dataset_name: 'SG'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
+  - dataset_name: 'ETTh1'
+    target_size: [96, 192, 336, 720]
+    window_size: 512
+    batch_size: 8
+    stride: 8
+  - dataset_name: 'ETTh2'
+    target_size: [96, 192, 336, 720]
+    window_size: 512
+    batch_size: 8
+    stride: 8
+  - dataset_name: 'ETTm1'
+    target_size: [96, 192, 336, 720]
+    window_size: 512
+    batch_size: 8
+    stride: 8
+  - dataset_name: 'ETTm2'
+    target_size: [96, 192, 336, 720]
+    window_size: 512
+    batch_size: 8
+    stride: 8

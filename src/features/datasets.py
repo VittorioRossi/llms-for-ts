@@ -137,6 +137,7 @@ class M4Dataset(Dataset):
             'window_size': kwargs.get('window_size', 24),
             'ts_features': [],
             'metadata': ["V1"]
+            'stride': kwargs.get('stride', 1)
         }
 
         for chunk in chunks:

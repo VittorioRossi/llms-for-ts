@@ -2,7 +2,6 @@
 from evaluation import evaluate
 from features import DATASET_LOADERS
 from models.baselines import mean_forecast, naive_forecast, ses_forecast
-from prompt.utils import get_available_templates
 import logging
 from tqdm import tqdm
 import numpy as np
@@ -22,7 +21,7 @@ logging.basicConfig(level=logging.INFO,
 
 logger = logging.getLogger(__name__)
 
-def run_experiment(model_name, dataset_name, window_size, target_size, batch_size=64, chunk_size=10, preds_path=None, limit_obs=None):
+def run_experiment(model_name, dataset_name, window_size, target_size, batch_size=64, chunk_size=10, preds_path=None, limit_obs=None, stride=None):
     model_name_clean = model_name.split('/')[1] if '/' in model_name else model_name
     run_name = f'{model_name_clean}_{dataset_name}_baseline_{window_size}_{target_size}'
     # check if dataset_name is in DATASET_LOADERS
@@ -41,7 +40,8 @@ def run_experiment(model_name, dataset_name, window_size, target_size, batch_siz
                                     window_size=window_size, 
                                     target_size=target_size,
                                     batch_size=batch_size,
-                                    chunksize=chunk_size)
+                                    chunksize=chunk_size,
+                                    stride=stride)
 
     logger.info('Loading model')
     
@@ -95,29 +95,43 @@ def main(config_path):
     results_dir = Path(config.get('results_path','experiments')) / config_name
     results_dir.mkdir(parents=True, exist_ok=True)
 
-    window_size = config.get('window_size', 15)
-    target_size = config.get('target_size', 1)
-    batch_size = config.get('batch_size', 64)
-    chunk_size = config.get('chunk_size', 10)
-    limit_obs = config.get('limit_obs', 50_000)
+    for experiment in config.get('experiments', []):
+        dataset_name = experiment.get('dataset_name')
+        window_size = experiment.get('window_size', 15)
+        target_size = experiment.get('target_size', 1)
+        batch_size = experiment.get('batch_size', 64)
+        chunk_size = experiment.get('chunk_size', 10)
+        limit_obs = experiment.get('limit_obs', 50_000)
+        stride = experiment.get('stride', 1)
 
-    run_name = f"baseline_{window_size}_{target_size}"
+        if dataset_name not in DATASET_LOADERS:
+            logging.error(f'Dataset {dataset_name} not found. Available datasets are: {list(DATASET_LOADERS.keys())}')
+            return
 
-    for model_name in MODELS.keys():
-        for dataset_name in DATASET_LOADERS.keys():
-            evals = run_experiment(model_name,
-                                   dataset_name,
-                                   window_size,
-                                   target_size,
-                                   batch_size,
-                                   chunk_size,
-                                   results_dir,
-                                   limit_obs)
+        for model_name in MODELS.keys():
+            
+            if not isinstance(window_size, list):
+                window_size = [window_size]
+            if not isinstance(target_size, list):
+                target_size = [target_size]
+            
+            for ws in window_size:
+                for ts in target_size:
+                    run_name = f"baseline_{dataset_name}_{ws}_{ts}"
+                    evals = run_experiment(model_name,
+                                        dataset_name,
+                                        ws,
+                                        ts,
+                                        batch_size,
+                                        chunk_size,
+                                        results_dir,
+                                        limit_obs,
+                                        stride=stride)
 
-            saving_path = results_dir / (run_name + '.txt')
-            saving_path.parent.mkdir(parents=True, exist_ok=True)
-            with open(saving_path, 'a+') as f:
-                f.write(evals.__str__() + '\n')
+                    saving_path = results_dir / (run_name + '.txt')
+                    saving_path.parent.mkdir(parents=True, exist_ok=True)
+                    with open(saving_path, 'a+') as f:
+                        f.write(evals.__str__() + '\n')
 
 if __name__=='__main__':
     main()

@@ -81,7 +81,7 @@ class Observation(BaseModel):
         """
         return prompt.render(data=self.X, metadata=self.metadata)
 
-def _create_observations_w_ft_and_meta(df: pd.DataFrame, prompt:Template, target: str, ts_features: List[str], metadata: List[str], window_size: int = 24, target_size: int = 1) -> List[Observation]:
+def _create_observations_w_ft_and_meta(df: pd.DataFrame, prompt:Template, target: str, ts_features: List[str], metadata: List[str], window_size: int = 24, target_size: int = 1, stride=1) -> List[Observation]:
     """
     Create an observation object with time series features.
 
@@ -109,7 +109,7 @@ def _create_observations_w_ft_and_meta(df: pd.DataFrame, prompt:Template, target
     
     # Create the list of observations
     X_fin, y_fin = [], []
-    for i in range(slice_end):
+    for i in range(0, slice_end, stride):  # Adjust the range to use the stride
         y = df[target].iloc[i + window_size: i + window_size + target_size].values.flatten()
         if np.isnan(y).any():
             continue
@@ -139,6 +139,7 @@ def process_dataset(dataset: pd.DataFrame,
                     target:str,
                     ts_features: List[str] = [],
                     metadata: List[str] = [],
+                    stride:int = 1,
                     *args,
                     **kwargs) -> List[Tuple[str, np.ndarray]]:
     """
@@ -166,12 +167,13 @@ def process_dataset(dataset: pd.DataFrame,
         #the metadata specifies the object 
         for group in dataset.groupby(metadata):
             X_group, y_group = _create_observations_w_ft_and_meta(group[1], 
-                                                                            prompt,
-                                                                            target, 
-                                                                            ts_features=ts_features, 
-                                                                            metadata=metadata, 
-                                                                            window_size=window_size, 
-                                                                            target_size=target_size)
+                                                                prompt,
+                                                                target, 
+                                                                ts_features=ts_features, 
+                                                                metadata=metadata, 
+                                                                window_size=window_size, 
+                                                                target_size=target_size,
+                                                                stride = stride)
             X.extend(X_group)
             y.extend(y_group)
     else:
@@ -181,7 +183,8 @@ def process_dataset(dataset: pd.DataFrame,
                                                     ts_features=ts_features, 
                                                     metadata=[], 
                                                     window_size=window_size, 
-                                                    target_size=target_size)
+                                                    target_size=target_size,
+                                                    stride = stride)
     
     return X, y
 
