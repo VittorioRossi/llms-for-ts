@@ -38,7 +38,16 @@ def load_model(model_name, example_output, is_chat_model=True, **kwargs):
             logger.error(e)
             return
 
-def run_experiment(model_name, dataset_name, prompt_name, window_size, target_size, stride, batch_size=64, chunk_size=10, preds_path=None, univariate=False, limit_obs=None, is_chat_model=False, **kwargs):
+def run_experiment(model_name, 
+                   dataset_name, 
+                   prompt_name, 
+                   window_size, 
+                   target_size, 
+                   stride, 
+                   batch_size=64, 
+                   chunk_size=10, 
+                   preds_path=None, 
+                   is_chat_model=False, **kwargs):
     model_name_clean = model_name.split('/')[1] if '/' in model_name else model_name
     run_name = f'{model_name_clean}_{dataset_name}_{prompt_name}_{window_size}_{target_size}_{stride}'
     # check if dataset_name is in DATASET_LOADERS
@@ -62,8 +71,7 @@ def run_experiment(model_name, dataset_name, prompt_name, window_size, target_si
                                     target_size=target_size,
                                     batch_size=batch_size,
                                     stride=stride,
-                                    chunksize=chunk_size,
-                                    univariate=univariate)
+                                    chunksize=chunk_size)
 
 
     logger.info('Loading model')
@@ -78,15 +86,11 @@ def run_experiment(model_name, dataset_name, prompt_name, window_size, target_si
     true = []
 
     # observation is a batch contatinign (X, y) where X has size 64 x window_size and y has size 64 x target_size
-    num_bateches = limit_obs//batch_size
     n_batches = 0
-    for observation in tqdm(data_generator, total=num_bateches):
+    for observation in tqdm(data_generator):
         prediction = model.generate(observation[0])
         preds.extend(prediction)
         true.extend(observation[1])
-
-        if n_batches == num_bateches:
-            break
 
         n_batches += 1
 
@@ -127,8 +131,6 @@ def main(config_path):
         target_size = experiment.get('target_size', 1)
         batch_size = experiment.get('batch_size', 64)
         chunk_size = experiment.get('chunk_size', 10)
-        univariate = experiment.get('univariate', False)
-        limit_obs = experiment.get('limit_obs', 50_000)
         is_chat_model = experiment.get('is_chat_model', True)
         max_token_mutliplier = experiment.get('max_token_mutliplier', 1)
         stride = experiment.get('stride', 1)
@@ -146,8 +148,6 @@ def main(config_path):
                                        batch_size=batch_size,
                                        chunk_size=chunk_size,
                                        results_dir=results_dir,
-                                       univariate=univariate,
-                                       limit_obs=limit_obs,
                                        is_chat_model=is_chat_model, 
                                        max_token_mutliplier=max_token_mutliplier,
                                        stride=stride)
@@ -165,8 +165,6 @@ def main(config_path):
                                    batch_size,
                                    chunk_size,
                                    results_dir,
-                                   univariate,
-                                   limit_obs,
                                    is_chat_model=is_chat_model,
                                    max_token_mutliplier=max_token_mutliplier)
 
