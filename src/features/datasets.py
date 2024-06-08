@@ -143,7 +143,7 @@ class M4Dataset(Dataset):
 
         limit_rows = kwargs.get('limit_rows', None)
         if limit_rows:
-            chunks = pd.read_csv(self.df_path, chunksize=chunksize, nrows=limit_rows)
+            chunks = pd.read_csv(self.df_path, nrows=limit_rows)
         else:
             chunks = pd.read_csv(self.df_path, chunksize=chunksize)
 
@@ -247,6 +247,7 @@ class GWTDataset(Dataset):
         self.df_path = f'{self.path}/train.csv'
         self.cache_folder = cache_folder
         self.example_output = "0000"
+        self.seasonalities = [7]
     
     def process(self, prompt_name:str, batch_size, chunksize = 1000, **kwargs):
         cache_path = build_cache_path(self.cache_folder, prompt_name=prompt_name, **kwargs)
