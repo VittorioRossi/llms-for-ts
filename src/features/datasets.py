@@ -143,7 +143,7 @@ class M4Dataset(Dataset):
 
         limit_rows = kwargs.get('limit_rows', None)
         if limit_rows:
-            chunks = pd.read_csv(self.df_path, nrows=limit_rows)
+            chunks = pd.read_csv(self.df_path, chunksize=chunksize, nrows=limit_rows)
         else:
             chunks = pd.read_csv(self.df_path, chunksize=chunksize)
 
