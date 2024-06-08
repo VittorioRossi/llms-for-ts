@@ -9,8 +9,8 @@ from pathlib import Path
 
 #### CACHING ####
 
-def build_cache_path(cache_folder, window_size, target_size,  prompt_name='', **kwargs):
-    return Path(cache_folder) / f'{prompt_name}_{window_size}_{target_size}.csv'
+def build_cache_path(cache_folder, window_size, target_size, stride, prompt_name='', **kwargs):
+    return Path(cache_folder) / f'{prompt_name}_{window_size}_{target_size}_{stride}.csv'
 
 def cache_dataset(X, y, cache_path, **kwargs):
     cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -41,7 +41,7 @@ def load_dataset_file(dataset_name, **kwargs):
 
 class Dataset(ABC):
     @abstractmethod
-    def process(self, promt_name):
+    def process(self, prompt_name):
         pass
 
 class CTDataset(Dataset):
@@ -51,8 +51,8 @@ class CTDataset(Dataset):
         self.example_output = "000"
         self.seasonalities = [366]
 
-    def process(self, promt_name:str, batch_size:int, **kwargs):
-        cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
+    def process(self, prompt_name:str, batch_size:int, **kwargs):
+        cache_path = build_cache_path(self.cache_folder, prompt_name=prompt_name, **kwargs)
         if self.cache_folder and cache_path.exists():
             return load_cached_data(cache_path, batch_size=batch_size)
 
@@ -70,15 +70,15 @@ class SGDataset(Dataset):
         self.example_output = "000"
         self.seasonalities = [7]
 
-    def process(self, promt_name, batch_size, **kwargs):
-        cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
+    def process(self, prompt_name, batch_size, **kwargs):
+        cache_path = build_cache_path(self.cache_folder, prompt_name=prompt_name, **kwargs)
         if self.cache_folder and cache_path.exists():
             return load_cached_data(cache_path, batch_size=batch_size)
 
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines()
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines()
         X = [x.replace(',', '') for x in X]
-        cache_dataset(X, y, cache_path, promt_name=promt_name, **kwargs)
+        cache_dataset(X, y, cache_path, prompt_name=prompt_name, **kwargs)
         batches = utils.create_batches(X, y, batch_size)
         return batches # this is a generator
     
@@ -93,8 +93,8 @@ class ETTHDataset(Dataset):
         self.example_output = "00"
         self.seasonalities = [24, 168] #daily and weekly
     
-    def process(self, promt_name:str,batch_size:int, **kwargs):
-        cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
+    def process(self, prompt_name:str,batch_size:int, **kwargs):
+        cache_path = build_cache_path(self.cache_folder, prompt_name=prompt_name, **kwargs)
         if self.cache_folder and cache_path.exists():
             return load_cached_data(cache_path, batch_size=batch_size)
         
@@ -108,8 +108,8 @@ class ETTHDataset(Dataset):
             'metadata': kwargs.get('metadata', []),
         }
         df = df.rename(columns={'OT': 'target'})
-        X, y = utils.process_dataset(df, promt_name, **config)
-        cache_dataset(X, y, cache_path, promt_name=promt_name, **config)
+        X, y = utils.process_dataset(df, prompt_name, **config)
+        cache_dataset(X, y, cache_path, prompt_name=prompt_name, **config)
         return utils.create_batches(X, y, batch_size)
 
 class M4Dataset(Dataset):
@@ -117,8 +117,8 @@ class M4Dataset(Dataset):
     M4Dataset is a dataset class that takes in a path to the M4 dataset and processes it.
     """
     def __init__(self, path:str = '/data/raw/m4', cache_folder = 'data/processed/m4', name = 'weekly', train = True, **kwargs):
-        if not name in ['monthly', 'quarterly', 'weekly']:
-            raise ValueError("Name must be one of 'Monthly', 'Quarterly', 'Weekly'")
+        if not name in ['month', 'week', 'quarter']:
+            raise ValueError("Name must be one of 'month', 'quarter', 'week'")
 
         self.path = path
         self.df_path = f'{self.path}/' + ('train.csv' if train else 'test.csv')
@@ -134,8 +134,8 @@ class M4Dataset(Dataset):
         elif name == 'Monthly':
             return [12]
     
-    def process(self, promt_name:str, batch_size, chunksize = 1000, **kwargs):
-        cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
+    def process(self, prompt_name:str, batch_size, chunksize = 1000, **kwargs):
+        cache_path = build_cache_path(self.cache_folder, prompt_name=prompt_name, **kwargs)
         if self.cache_folder and cache_path.exists():
             for batch in load_cached_data(cache_path, batch_size=batch_size):
                 yield batch
@@ -159,8 +159,8 @@ class M4Dataset(Dataset):
         for chunk in chunks:
             chunk = chunk.melt(id_vars=['V1'], var_name='d', value_name='target')
             chunk['target'] = chunk['target'].round(2)
-            X,y = utils.process_dataset(chunk, promt_name, **config)
-            cache_dataset(X, y, cache_path,promt_name=promt_name, **config)
+            X,y = utils.process_dataset(chunk, prompt_name, **config)
+            cache_dataset(X, y, cache_path,prompt_name=prompt_name, **config)
             for batch in utils.create_batches(X, y, batch_size):
                 yield batch
 
@@ -199,8 +199,8 @@ class M5Dataset(Dataset):
         df = df.merge(self.prices, how='left', on="wm_yr_wk")
         return df
     
-    def process(self, promt_name:str, batch_size, chunksize=100, **kwargs):
-        cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
+    def process(self, prompt_name:str, batch_size, chunksize=100, **kwargs):
+        cache_path = build_cache_path(self.cache_folder, prompt_name=prompt_name, **kwargs)
         if self.cache_folder and cache_path.exists():
             for batch in load_cached_data(cache_path, batch_size=batch_size):
                 yield batch
@@ -232,8 +232,8 @@ class M5Dataset(Dataset):
             if merge_data:
                 chunk = self._merge_metadata(chunk)
             
-            X, y = utils.process_dataset(chunk, promt_name, **config)
-            cache_dataset(X, y, cache_path,promt_name=promt_name, **config)
+            X, y = utils.process_dataset(chunk, prompt_name, **config)
+            cache_dataset(X, y, cache_path,prompt_name=prompt_name, **config)
 
             for batch in  utils.create_batches(X, y, batch_size):
                 yield batch
@@ -248,8 +248,8 @@ class GWTDataset(Dataset):
         self.cache_folder = cache_folder
         self.example_output = "0000"
     
-    def process(self, promt_name:str, batch_size, chunksize = 1000, **kwargs):
-        cache_path = build_cache_path(self.cache_folder, promt_name=promt_name, **kwargs)
+    def process(self, prompt_name:str, batch_size, chunksize = 1000, **kwargs):
+        cache_path = build_cache_path(self.cache_folder, prompt_name=prompt_name, **kwargs)
         if self.cache_folder and cache_path.exists():
             for batch in load_cached_data(cache_path, batch_size=batch_size):
                 yield batch
@@ -269,7 +269,7 @@ class GWTDataset(Dataset):
         }
         for chunk in chunks:
             chunk = chunk.melt(id_vars=['Page'], var_name='d', value_name='target').astype({'d': 'str', 'target':"float"})
-            X, y = utils.process_dataset(chunk, promt_name, **config)
-            cache_dataset(X, y, cache_path,promt_name=promt_name, **config)
+            X, y = utils.process_dataset(chunk, prompt_name, **config)
+            cache_dataset(X, y, cache_path,prompt_name=prompt_name, **config)
             for batch in utils.create_batches(X,y, batch_size):
                 yield batch
