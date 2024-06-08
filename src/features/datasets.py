@@ -49,7 +49,7 @@ class CTDataset(Dataset):
         self.path = path
         self.cache_folder = cache_folder
         self.example_output = "000"
-        self.seasonalities = [1]
+        self.seasonalities = []
 
     def process(self, prompt_name:str, batch_size:int, **kwargs):
         cache_path = build_cache_path(self.cache_folder, prompt_name=prompt_name, **kwargs)
@@ -127,11 +127,11 @@ class M4Dataset(Dataset):
         self.seasonalities = self._compute_seasonality(name)
 
     def _compute_seasonality(self, name):
-        if name == 'Weekly':
+        if name == 'week':
             return [52]
-        elif name == 'Quarterly':
+        elif name == 'quarter':
             return [4]
-        elif name == 'Monthly':
+        elif name == 'month':
             return [12]
     
     def process(self, prompt_name:str, batch_size, chunksize = 1000, **kwargs):
