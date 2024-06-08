@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 import os
 import numpy as np
 import logging
+import regex as re
 
 logging.basicConfig(level=logging.INFO, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -20,22 +21,24 @@ def compute_new_tokens(target_size, example_output, tokenizer):
     example_tokens = tokenizer(example_output, add_special_tokens=False)['input_ids']
     return target_size * len(example_tokens)
 
-def clean_pred(pred: str, target_size: int):
-    # Split the predicted string into tokens
-    tokens = pred.strip().split()[:target_size]
 
+def extract_numbers(text):
+    # Find all sequences of digits with optional decimal points in the text
+    numbers = re.findall(r'\d+(?:\.\d+)?', text)
+    # Convert the sequences of digits to float or int based on their content
+    return [float(num) if '.' in num else int(num) for num in numbers]
+
+def clean_pred(pred: str, target_size: int):
+    # Extract numbers from the prediction string
+    numbers = extract_numbers(pred)
+    
     # Initialize the result list
     res = []
 
-    for token in tokens:
-        try:
-            # Attempt to convert each token to a float
-            res.append(float(token))
-        except ValueError:
-            # If conversion fails, append np.nan
-            res.append(np.nan)
+    for num in numbers[:target_size]:
+        res.append(num)
 
-    # If the number of tokens is less than target_size, append np.nan to the result
+    # If the number of numbers is less than target_size, append np.nan to the result
     while len(res) < target_size:
         res.append(np.nan)
 
@@ -100,14 +103,14 @@ class HuggingFaceLLM(LLM):
         tokenizer_kwargs['padding_side'] = 'left'
         return AutoTokenizer.from_pretrained(model_name, token=token, **tokenizer_kwargs)
 
-    def tokenize_inputs(self, tokenizer, texts):
+    def tokenize_inputs(self, tokenizer, texts, max_length=1024):
         # Tokenize the batch of texts
         inputs = tokenizer(
             texts,
             return_tensors="pt",
-            padding='max_length',
+            padding=True,
             truncation='only_first',
-            max_length=1024,
+            max_length=max_length,
         )
     
         return {k: v.to(self.device) for k, v in inputs.items()}
@@ -178,14 +181,14 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
             for message in batch_messages
         ]
 
-    def tokenize_batch(self, tokenizer, batch_messages):
+    def tokenize_batch(self, tokenizer, batch_messages, max_length=1024):
         def apply_chat_template(messages):
             return tokenizer(
                 tokenizer.eos_token.join([msg['content'] for msg in messages]),
                 return_tensors="pt",
-                padding='max_length',
+                padding=True,
                 truncation='only_first',
-                max_length=1024
+                max_length=max_length
             )
 
         inputs_batch = [apply_chat_template(messages) for messages in batch_messages]
