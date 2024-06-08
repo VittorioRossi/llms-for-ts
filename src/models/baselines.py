@@ -2,16 +2,15 @@ import numpy as np
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 def naive_forecast(data, target_size=1, seasonality=0):
-    if isinstance(seasonality, list):
-        ses = []
-        for s in seasonality:
-            ses.append(data[-s])
-        return np.mean(ses)
+    if not isinstance(seasonality, list):
+        seasonality = [seasonality]
     
-    if seasonality == 0:
-        return data[-target_size:]
+    preds = []
+    for i in range(target_size):
+        seasonal_values = [data[-s+i] for s in seasonality]
+        preds.append(np.mean(seasonal_values))
     
-    return data[-seasonality:-seasonality+target_size]
+    return preds
 
 def mean_forecast(data, target_size=1, seasonality=0):
     avg = np.mean(data)
