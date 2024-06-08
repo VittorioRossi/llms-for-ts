@@ -1,4 +1,4 @@
-results_path: '/content/gdrive/MyDrive/tesi'
+results_path: '/content/gdrive/MyDrive/tesi/baseline'
 experiments:
 #  - dataset_name: 'CT'
 #    target_size: 1
