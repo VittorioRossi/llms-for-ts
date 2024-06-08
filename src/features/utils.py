@@ -120,18 +120,6 @@ def _create_observations_w_ft_and_meta(df: pd.DataFrame, prompt:Template, target
     
     return X_fin, y_fin
 
-# Find the indices of the first and last non-NaN values
-def remove_leading_trailing_nans(array):
-    mask = ~np.isnan(array)
-    if mask.any():
-        first_valid_index = np.argmax(mask)
-        last_valid_index = len(mask) - np.argmax(mask[::-1]) - 1
-        return array[first_valid_index:last_valid_index + 1]
-    else:
-        # If the array is entirely NaNs, return an empty array
-        return np.array([], dtype=array.dtype)
-
-
 def process_dataset(dataset: pd.DataFrame,
                     prompt_name: str, 
                     window_size:int, 
@@ -187,33 +175,6 @@ def process_dataset(dataset: pd.DataFrame,
                                                     stride = stride)
     
     return X, y
-
-def process_univariate(series, prompt_name, window_size, target_size, **kwargs):
-    """
-    Create an observation object with a univariate time series.
-
-    Args:
-        series (pd.Series): The input time series.
-        window_size (int): The size of the sliding window used to create the observation.
-        target_size (int): The number of future time steps to predict.
-
-    Returns:
-        Observation: An observation object containing the input features (X) and target variable (y).
-    """
-    prompt: Template = load_template(prompt_name)
-    series = remove_leading_trailing_nans(series.astype(float))
-
-    X_res, y_res = [], []
-
-    for i in range(len(series) - window_size - target_size):
-        X = {'target': series[i:i + window_size]}
-        y = np.array(series[i + window_size: i + window_size + target_size])
-        ob = Observation(X=X, y=y.flatten(), target_name='target')
-        X_res.append(ob.render(prompt))
-        y_res.append(ob.y)
-    
-    return X_res, y_res
-
 
 def create_batches(X, y, batch_size):
     """Yield successive batches from a list."""
