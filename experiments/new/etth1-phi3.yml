@@ -1,0 +1,8 @@
+results_path: '/content/gdrive/MyDrive/tesi'
+experiments: 
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    dataset_name: 'ETTh1'
+    target_size: 96
+    window_size: 512
+    batch_size: 8
+    prompt_name: 'base'
