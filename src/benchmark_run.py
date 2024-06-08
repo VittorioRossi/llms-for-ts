@@ -88,13 +88,11 @@ def run_experiment(model_name,
     true = []
 
     # observation is a batch contatinign (X, y) where X has size 64 x window_size and y has size 64 x target_size
-    n_batches = 0
     for observation in tqdm(data_generator):
         prediction = model.generate(observation[0])
-        preds.append(prediction)
+        preds.extend(prediction)
         true.extend(observation[1])
 
-        n_batches += 1
 
     preds = np.array(preds).reshape(-1, target_size).astype(float)
     true = np.array(true).reshape(-1, target_size).astype(float)
