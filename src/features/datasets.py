@@ -16,14 +16,14 @@ def cache_dataset(X, y, cache_path, **kwargs):
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     
     with open(cache_path, 'a') as f:  # Use 'a' to append to the file
-        for xi, yi in zip(X, y):
-            f.write(f'{xi},{yi}\n')  # Write yi as a quoted string
+        for xi, yi in zip(X,y):
+            f.write(f'{xi};{yi}\n')  # Write yi as a quoted string
 
 def load_cached_data(cache_path, batch_size=64):
     with open(cache_path, 'r') as f:
         data = f.readlines()
 
-    X, y = zip(*[line.strip().split(',') for line in data])
+    X, y = zip(*[line.strip().split(';') for line in data])
     X = list(X)
 
     y = [ast.literal_eval(item) for item in y]
