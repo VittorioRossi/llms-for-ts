@@ -49,7 +49,7 @@ class CTDataset(Dataset):
         self.path = path
         self.cache_folder = cache_folder
         self.example_output = "000"
-        self.seasonalities = [366]
+        self.seasonalities = [1]
 
     def process(self, prompt_name:str, batch_size:int, **kwargs):
         cache_path = build_cache_path(self.cache_folder, prompt_name=prompt_name, **kwargs)
