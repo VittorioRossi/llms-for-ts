@@ -139,7 +139,7 @@ class M4Dataset(Dataset):
         if self.cache_folder and cache_path.exists():
             for batch in load_cached_data(cache_path, batch_size=batch_size):
                 yield batch
-
+            return 
 
         limit_rows = kwargs.get('limit_rows', None)
         if limit_rows:
@@ -204,6 +204,7 @@ class M5Dataset(Dataset):
         if self.cache_folder and cache_path.exists():
             for batch in load_cached_data(cache_path, batch_size=batch_size):
                 yield batch
+            return 
 
         limit_rows = kwargs.get('limit_rows', None)
         if limit_rows:
@@ -254,6 +255,7 @@ class GWTDataset(Dataset):
         if self.cache_folder and cache_path.exists():
             for batch in load_cached_data(cache_path, batch_size=batch_size):
                 yield batch
+            return 
         
         limit_rows = kwargs.get('limit_rows', None)
         if limit_rows:
