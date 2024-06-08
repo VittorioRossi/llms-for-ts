@@ -7,3 +7,4 @@ experiments:
     batch_size: 8
     stride: 8
     prompt_name: 'base'
+    is_chat_model: False
