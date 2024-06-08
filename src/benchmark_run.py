@@ -10,6 +10,8 @@ import click
 import numpy as np
 from pathlib import Path
 import yaml
+import warnings
+warnings.filterwarnings("ignore")
 
 logging.basicConfig(level=logging.INFO, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')

@@ -8,6 +8,9 @@ import numpy as np
 from pathlib import Path
 import click
 import yaml
+import warnings
+warnings.filterwarnings("ignore")
+
 
 MODELS = {
     'mean': mean_forecast,
@@ -41,7 +44,8 @@ def run_experiment(model_name, dataset_name, window_size, target_size, batch_siz
                                     target_size=target_size,
                                     batch_size=batch_size,
                                     chunksize=chunk_size,
-                                    stride=stride, limit_rows=limit_rows)
+                                    stride=stride, 
+                                    limit_rows=limit_rows)
 
     logger.info('Loading model')
     
