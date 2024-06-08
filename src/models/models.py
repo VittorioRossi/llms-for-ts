@@ -106,7 +106,7 @@ class HuggingFaceLLM(LLM):
             texts,
             return_tensors="pt",
             padding='max_length',
-            truncation='max_length',
+            truncation='only_first',
             max_length=1024,
         )
     
