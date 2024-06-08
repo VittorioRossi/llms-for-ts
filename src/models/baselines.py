@@ -20,8 +20,6 @@ def ses_forecast(data, target_size=1, seasonality=0):
     # Initialize the Exponential Smoothing model with seasonality
     model = ExponentialSmoothing(
         data,
-        seasonal='add',  # or 'mul' for multiplicative seasonality
-        seasonal_periods=seasonality,
         initialization_method='estimated'
     ).fit()
 
