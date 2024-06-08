@@ -138,16 +138,16 @@ def main(config_path):
         run_name = f"{model_name_clean}_{dataset_name}_{prompt_name}_{window_size}_{target_size}"
         if dataset_name == 'all':
             for dataset_name in DATASET_LOADERS.keys():
-                evals = run_experiment(model_name,
-                                       dataset_name,
-                                       prompt_name,
-                                       window_size,
-                                       target_size,
-                                       batch_size,
-                                       chunk_size,
-                                       results_dir,
-                                       univariate,
-                                       limit_obs,
+                evals = run_experiment(model_name=model_name,
+                                       dataset_name=dataset_name,
+                                       prompt_name=prompt_name,
+                                       window_size=window_size,
+                                       target_size=target_size,
+                                       batch_size=batch_size,
+                                       chunk_size=chunk_size,
+                                       results_dir=results_dir,
+                                       univariate=univariate,
+                                       limit_obs=limit_obs,
                                        is_chat_model=is_chat_model, 
                                        max_token_mutliplier=max_token_mutliplier,
                                        stride=stride)
