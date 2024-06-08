@@ -1,13 +1,13 @@
 results_path: '/content/gdrive/MyDrive/tesi/baseline'
 experiments:
-#  - dataset_name: 'CT'
-#    target_size: 1
-#    window_size: 15
-#    batch_size: 64
-#  - dataset_name: 'SG'
-#    target_size: 1
-#    window_size: 15
-#    batch_size: 64
+  - dataset_name: 'CT'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
+  - dataset_name: 'SG'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
   - dataset_name: 'ETTh1'
     target_size: 96
     window_size: 512
@@ -28,12 +28,6 @@ experiments:
     window_size: 512
     batch_size: 8
     stride: 8
-  - dataset_name: 'GWT'
-    target_size: 96
-    window_size: 512
-    batch_size: 8
-    stride: 8
-    limit_rows: 100
   - dataset_name: 'M4-quarter'
     target_size: 8
     window_size: [12, 20]
@@ -64,4 +58,3 @@ experiments:
     batch_size: 8
     stride: 1
     limit_rows: 100
-  

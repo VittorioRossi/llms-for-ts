@@ -46,7 +46,8 @@ def run_experiment(model_name,
                    stride, 
                    batch_size=64, 
                    chunk_size=10, 
-                   preds_path=None, 
+                   limit_rows=100,
+                   preds_path=None,
                    is_chat_model=False, **kwargs):
     model_name_clean = model_name.split('/')[1] if '/' in model_name else model_name
     run_name = f'{model_name_clean}_{dataset_name}_{prompt_name}_{window_size}_{target_size}_{stride}'
@@ -71,7 +72,8 @@ def run_experiment(model_name,
                                     target_size=target_size,
                                     batch_size=batch_size,
                                     stride=stride,
-                                    chunksize=chunk_size)
+                                    chunksize=chunk_size,
+                                    limit_rows=limit_rows)
 
 
     logger.info('Loading model')
@@ -89,7 +91,7 @@ def run_experiment(model_name,
     n_batches = 0
     for observation in tqdm(data_generator):
         prediction = model.generate(observation[0])
-        preds.extend(prediction)
+        preds.append(prediction)
         true.extend(observation[1])
 
         n_batches += 1
@@ -134,6 +136,7 @@ def main(config_path):
         is_chat_model = experiment.get('is_chat_model', True)
         max_token_mutliplier = experiment.get('max_token_mutliplier', 1)
         stride = experiment.get('stride', 1)
+        limit_rows = experiment.get('limit_rows', 100)
 
     
         model_name_clean = model_name.split('/')[1] if '/' in model_name else model_name
@@ -148,6 +151,7 @@ def main(config_path):
                                        batch_size=batch_size,
                                        chunk_size=chunk_size,
                                        results_dir=results_dir,
+                                       limit_rows=limit_rows,
                                        is_chat_model=is_chat_model, 
                                        max_token_mutliplier=max_token_mutliplier,
                                        stride=stride)
@@ -165,6 +169,7 @@ def main(config_path):
                                    batch_size,
                                    chunk_size,
                                    results_dir,
+                                   limit_rows=limit_rows,
                                    is_chat_model=is_chat_model,
                                    max_token_mutliplier=max_token_mutliplier)
 

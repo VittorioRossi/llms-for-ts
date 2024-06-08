@@ -41,7 +41,7 @@ def run_experiment(model_name, dataset_name, window_size, target_size, batch_siz
                                     target_size=target_size,
                                     batch_size=batch_size,
                                     chunksize=chunk_size,
-                                    stride=stride)
+                                    stride=stride, limit_rows=limit_rows)
 
     logger.info('Loading model')
     
@@ -52,19 +52,13 @@ def run_experiment(model_name, dataset_name, window_size, target_size, batch_siz
     true = []
 
     # observation is a batch contatinign (X, y) where X has size 64 x window_size and y has size 64 x target_size
-    num_bateches = limit_rows//batch_size
-    n_batches = 0
-    for observation in tqdm(data_generator, total=num_bateches):
+    for observation in tqdm(data_generator):
         cleaned_obs = [list(map(float, obs.strip().split())) for obs in observation[0]]
-        prediction = [model(cl, target_size, seasonality=dataset.seasonalities) for cl in cleaned_obs]
+        prediction = [model(cl, target_size=target_size, seasonality=dataset.seasonalities) for cl in cleaned_obs]
 
-        preds.extend(prediction)
+        preds.append(prediction)
         true.extend(observation[1])
 
-        if n_batches == num_bateches:
-            break
-
-        n_batches += 1
 
     preds = np.array(preds).reshape(-1, target_size).astype(float)
     true = np.array(true).reshape(-1, target_size).astype(float)
