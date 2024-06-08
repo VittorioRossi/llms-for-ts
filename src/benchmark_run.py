@@ -38,9 +38,9 @@ def load_model(model_name, example_output, is_chat_model=True, **kwargs):
             logger.error(e)
             return
 
-def run_experiment(model_name, dataset_name, prompt_name, window_size, target_size, batch_size=64, chunk_size=10, preds_path=None, univariate=False, limit_obs=None, is_chat_model=False, **kwargs):
+def run_experiment(model_name, dataset_name, prompt_name, window_size, target_size, stride, batch_size=64, chunk_size=10, preds_path=None, univariate=False, limit_obs=None, is_chat_model=False, **kwargs):
     model_name_clean = model_name.split('/')[1] if '/' in model_name else model_name
-    run_name = f'{model_name_clean}_{dataset_name}_{prompt_name}_{window_size}_{target_size}'
+    run_name = f'{model_name_clean}_{dataset_name}_{prompt_name}_{window_size}_{target_size}_{stride}'
     # check if dataset_name is in DATASET_LOADERS
     if dataset_name not in DATASET_LOADERS:
         logging.error(f'Dataset {dataset_name} not found. Available datasets are: {list(DATASET_LOADERS.keys())}')
@@ -61,6 +61,7 @@ def run_experiment(model_name, dataset_name, prompt_name, window_size, target_si
                                     window_size=window_size, 
                                     target_size=target_size,
                                     batch_size=batch_size,
+                                    stride=stride,
                                     chunksize=chunk_size,
                                     univariate=univariate)
 
@@ -130,7 +131,7 @@ def main(config_path):
         limit_obs = experiment.get('limit_obs', 50_000)
         is_chat_model = experiment.get('is_chat_model', True)
         max_token_mutliplier = experiment.get('max_token_mutliplier', 1)
-
+        stride = experiment.get('stride', 1)
 
     
         model_name_clean = model_name.split('/')[1] if '/' in model_name else model_name
@@ -148,7 +149,8 @@ def main(config_path):
                                        univariate,
                                        limit_obs,
                                        is_chat_model=is_chat_model, 
-                                       max_token_mutliplier=max_token_mutliplier)
+                                       max_token_mutliplier=max_token_mutliplier,
+                                       stride=stride)
                 saving_path = results_dir / (run_name + '.txt')
                 saving_path.parent.mkdir(parents=True, exist_ok=True)
                 with open(saving_path, 'a+') as f:
