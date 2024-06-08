@@ -136,7 +136,7 @@ class M4Dataset(Dataset):
             'target_size': kwargs.get('target_size', 1),
             'window_size': kwargs.get('window_size', 24),
             'ts_features': [],
-            'metadata': ["V1"]
+            'metadata': ["V1"],
             'stride': kwargs.get('stride', 1)
         }
 

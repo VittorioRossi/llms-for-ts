@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 def run_experiment(model_name, dataset_name, window_size, target_size, batch_size=64, chunk_size=10, preds_path=None, limit_obs=None, stride=None):
     model_name_clean = model_name.split('/')[1] if '/' in model_name else model_name
-    run_name = f'{model_name_clean}_{dataset_name}_baseline_{window_size}_{target_size}'
+    run_name = f'{model_name_clean}_{dataset_name}_baseline_{window_size}_{target_size}_{stride}'
     # check if dataset_name is in DATASET_LOADERS
     if dataset_name not in DATASET_LOADERS:
         logging.error(f'Dataset {dataset_name} not found. Available datasets are: {list(DATASET_LOADERS.keys())}')
@@ -117,7 +117,7 @@ def main(config_path):
             
             for ws in window_size:
                 for ts in target_size:
-                    run_name = f"baseline_{dataset_name}_{ws}_{ts}"
+                    run_name = f"{dataset_name}_{model_name}_{ws}_{ts}_{stride}"
                     evals = run_experiment(model_name,
                                         dataset_name,
                                         ws,
@@ -128,10 +128,11 @@ def main(config_path):
                                         limit_obs,
                                         stride=stride)
 
-                    saving_path = results_dir / (run_name + '.txt')
+                    saving_path = results_dir / ('baseline' + '.txt')
                     saving_path.parent.mkdir(parents=True, exist_ok=True)
+                    string_to_write = f'{run_name}: {evals.__str__()}' + '\n'
                     with open(saving_path, 'a+') as f:
-                        f.write(evals.__str__() + '\n')
+                        f.write(string_to_write)
 
 if __name__=='__main__':
     main()

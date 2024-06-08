@@ -1,13 +1,13 @@
 results_path: '/content/gdrive/MyDrive/tesi'
 experiments:
-  - dataset_name: 'CT'
-    target_size: 1
-    window_size: 15
-    batch_size: 64
-  - dataset_name: 'SG'
-    target_size: 1
-    window_size: 15
-    batch_size: 64
+#  - dataset_name: 'CT'
+#    target_size: 1
+#    window_size: 15
+#    batch_size: 64
+#  - dataset_name: 'SG'
+#    target_size: 1
+#    window_size: 15
+#    batch_size: 64
   - dataset_name: 'ETTh1'
     target_size: [96, 192, 336, 720]
     window_size: 512
@@ -28,3 +28,34 @@ experiments:
     window_size: 512
     batch_size: 8
     stride: 8
+  - dataset_name: 'GWT'
+    target_size: [96, 192, 336, 720]
+    window_size: 512
+    batch_size: 8
+    stride: 8
+  - dataset_name: 'M4-quarter'
+    target_size: 8
+    window_size: [12, 20]
+    batch_size: 8
+    stride: 1
+  - dataset_name: 'M4-month'
+    target_size: 18
+    window_size: [12, 24, 36, 60]
+    batch_size: 8
+    stride: 1
+  - dataset_name: 'M4-year'
+    target_size: 6
+    window_size: [6, 12, 18]
+    batch_size: 8
+    stride: 1
+  - dataset_name: 'M5'
+    target_size: 28
+    window_size: [28, 56, 84, 140]
+    batch_size: 8
+    stride: 1
+  - dataset_name: 'GWT'
+    target_size: 28
+    window_size: [28, 56, 84, 140]
+    batch_size: 8
+    stride: 1
+  
