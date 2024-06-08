@@ -105,8 +105,8 @@ class HuggingFaceLLM(LLM):
         inputs = tokenizer(
             texts,
             return_tensors="pt",
-            padding=True,
-            truncation=True,
+            padding='max_length',
+            truncation='max_length',
             max_length=1024,
         )
     
@@ -184,8 +184,8 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
                 tokenizer.eos_token.join([msg['content'] for msg in messages]),
                 return_tensors="pt",
                 padding='max_length',
-                truncation=True,
-                max_length=256
+                truncation='max_length',
+                max_length=1024
             )
 
         inputs_batch = [apply_chat_template(messages) for messages in batch_messages]
