@@ -21,7 +21,7 @@ logging.basicConfig(level=logging.INFO,
 
 logger = logging.getLogger(__name__)
 
-def run_experiment(model_name, dataset_name, window_size, target_size, batch_size=64, chunk_size=10, preds_path=None, limit_obs=None, stride=None):
+def run_experiment(model_name, dataset_name, window_size, target_size, batch_size=64, chunk_size=10, preds_path=None, limit_rows=None, stride=None):
     model_name_clean = model_name.split('/')[1] if '/' in model_name else model_name
     run_name = f'{model_name_clean}_{dataset_name}_baseline_{window_size}_{target_size}_{stride}'
     # check if dataset_name is in DATASET_LOADERS
@@ -52,7 +52,7 @@ def run_experiment(model_name, dataset_name, window_size, target_size, batch_siz
     true = []
 
     # observation is a batch contatinign (X, y) where X has size 64 x window_size and y has size 64 x target_size
-    num_bateches = limit_obs//batch_size
+    num_bateches = limit_rows//batch_size
     n_batches = 0
     for observation in tqdm(data_generator, total=num_bateches):
         cleaned_obs = [list(map(float, obs.strip().split())) for obs in observation[0]]
@@ -101,7 +101,7 @@ def main(config_path):
         target_size = experiment.get('target_size', 1)
         batch_size = experiment.get('batch_size', 64)
         chunk_size = experiment.get('chunk_size', 10)
-        limit_obs = experiment.get('limit_obs', 50_000)
+        limit_rows = experiment.get('limit_rows', 50_000)
         stride = experiment.get('stride', 1)
 
         if dataset_name not in DATASET_LOADERS:
@@ -125,7 +125,7 @@ def main(config_path):
                                         batch_size,
                                         chunk_size,
                                         results_dir,
-                                        limit_obs,
+                                        limit_rows,
                                         stride=stride)
 
                     saving_path = results_dir / ('baseline' + '.txt')

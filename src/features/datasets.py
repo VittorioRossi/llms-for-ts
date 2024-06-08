@@ -6,6 +6,9 @@ import ast
 from . import utils
 from pathlib import Path
 
+
+#### CACHING ####
+
 def build_cache_path(cache_folder, window_size, target_size,  prompt_name='', **kwargs):
     return Path(cache_folder) / f'{prompt_name}_{window_size}_{target_size}.csv'
 
@@ -27,6 +30,14 @@ def load_cached_data(cache_path, batch_size=64):
     y = np.array(y).astype(float)
 
     return utils.create_batches(X, y, batch_size)
+
+#### LOADING ####
+
+def load_dataset_file(dataset_name, **kwargs):
+    ...
+
+
+
 
 class Dataset(ABC):
     @abstractmethod
@@ -128,8 +139,13 @@ class M4Dataset(Dataset):
         if self.cache_folder and cache_path.exists():
             for batch in load_cached_data(cache_path, batch_size=batch_size):
                 yield batch
-        
-        chunks = pd.read_csv(self.df_path, chunksize=chunksize)
+
+
+        limit_rows = kwargs.get('limit_rows', None)
+        if limit_rows:
+            chunks = pd.read_csv(self.df_path, chunksize=chunksize, nrows=limit_rows)
+        else:
+            chunks = pd.read_csv(self.df_path, chunksize=chunksize)
 
         config = {
             'target': 'target',
@@ -188,8 +204,13 @@ class M5Dataset(Dataset):
         if self.cache_folder and cache_path.exists():
             for batch in load_cached_data(cache_path, batch_size=batch_size):
                 yield batch
+
+        limit_rows = kwargs.get('limit_rows', None)
+        if limit_rows:
+            chunks = pd.read_csv(self.df_path, chunksize=chunksize, nrows=limit_rows)
+        else:
+            chunks = pd.read_csv(self.df_path, chunksize=chunksize)
         
-        chunks = pd.read_csv(self.df_path, chunksize=chunksize)
         merge_data = kwargs.get('merge', False)
         if merge_data:
             self.calendar = pd.read_csv(f'{self.path}/calendar.csv').astype({'d': 'str'})
@@ -233,7 +254,12 @@ class GWTDataset(Dataset):
             for batch in load_cached_data(cache_path, batch_size=batch_size):
                 yield batch
         
-        chunks = pd.read_csv(self.df_path, chunksize=chunksize)
+        limit_rows = kwargs.get('limit_rows', None)
+        if limit_rows:
+            chunks = pd.read_csv(self.df_path, chunksize=chunksize, nrows=limit_rows)
+        else:
+            chunks = pd.read_csv(self.df_path, chunksize=chunksize)
+
         config = {
             'target': 'target',
             'target_size': kwargs.get('target_size', 1),
@@ -247,13 +273,3 @@ class GWTDataset(Dataset):
             cache_dataset(X, y, cache_path,promt_name=promt_name, **config)
             for batch in utils.create_batches(X,y, batch_size):
                 yield batch
-
-
-class PEMSDataset(Dataset):
-    def __init__(self, path='data/raw/PEMS4') -> None:
-        self.path = path
-        self.distances = pd.read_csv(f'{self.path}/distances.csv')
-    
-    def process(self, promt_name:str, chunksize = 1000, **kwargs):
-        data = np.load(f'{self.path}/PEMS04.npz')['X']
-        ...
