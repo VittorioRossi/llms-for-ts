@@ -21,4 +21,4 @@ def ses_forecast(data, target_size=1, seasonality=0):
     model = ExponentialSmoothing(data, 
                                  seasonal_periods=seasonality).fit()
     
-    return model.forecast(target_size).fittedvalues
+    return model.forecast(target_size)[0]
