@@ -107,7 +107,7 @@ class HuggingFaceLLM(LLM):
             return_tensors="pt",
             padding=True,
             truncation=True,
-            max_length=256,
+            max_length=1024,
         )
     
         return {k: v.to(self.device) for k, v in inputs.items()}
