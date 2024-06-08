@@ -184,7 +184,7 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
                 tokenizer.eos_token.join([msg['content'] for msg in messages]),
                 return_tensors="pt",
                 padding='max_length',
-                truncation='max_length',
+                truncation='only_first',
                 max_length=1024
             )
 
