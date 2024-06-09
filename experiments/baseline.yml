@@ -9,22 +9,22 @@ experiments:
     window_size: 15
     batch_size: 64
   - dataset_name: 'ETTh1'
-    target_size: 96
+    target_size: 48
     window_size: 168
     batch_size: 8
     stride: 8
   - dataset_name: 'ETTh2'
-    target_size: 96
+    target_size: 48
     window_size: 168
     batch_size: 8
     stride: 8
   - dataset_name: 'ETTm1'
-    target_size: 96
+    target_size: 48
     window_size: 168
     batch_size: 8
     stride: 8
   - dataset_name: 'ETTm2'
-    target_size: 96
+    target_size: 48
     window_size: 168
     batch_size: 8
     stride: 8

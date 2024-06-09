@@ -18,7 +18,7 @@ experiments:
     prompt_name: 'base'
     is_chat_model: False
     dataset_name: 'ETTh1'
-    target_size: 96
+    target_size: 48
     window_size: 168
     batch_size: 8
     stride: 8
@@ -26,7 +26,7 @@ experiments:
     prompt_name: 'base'
     is_chat_model: False
     dataset_name: 'ETTh2'
-    target_size: 96
+    target_size: 48
     window_size: 168
     batch_size: 8
     stride: 8
@@ -34,7 +34,7 @@ experiments:
     prompt_name: 'base'
     is_chat_model: False
     dataset_name: 'ETTm1'
-    target_size: 96
+    target_size: 48
     window_size: 168
     batch_size: 8
     stride: 8
@@ -42,7 +42,7 @@ experiments:
     prompt_name: 'base'
     is_chat_model: False
     dataset_name: 'ETTm2'
-    target_size: 96
+    target_size: 48
     window_size: 168
     batch_size: 8
     stride: 8
