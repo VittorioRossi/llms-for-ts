@@ -121,7 +121,7 @@ def run_experiment(model_name,
         prediction = model.generate(observation[0])
         preds.extend(prediction)
         true.extend(observation[1])
-        file_logger.info(f'Prediction: {prediction}')
+        file_logger.info(f'Prediction: {prediction.__str__()}')
 
 
     preds = np.array(preds).reshape(-1, target_size).astype(float)

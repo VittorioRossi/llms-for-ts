@@ -65,8 +65,8 @@ def clean_pred(pred: str, target_size: int):
     while len(res) < target_size:
         res.append(np.nan)
 
-    file_logger.info(f'\nCleaning: {pred}')
-    file_logger.info(f'Cleaned: {res}\n')
+    file_logger.info(f'Cleaning: {pred.__str__()}')
+    file_logger.info(f'Cleaned: {res.__str__()}')
 
     return res
 
