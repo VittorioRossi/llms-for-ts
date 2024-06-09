@@ -64,9 +64,10 @@ def run_experiment(model_name, dataset_name, window_size, target_size, batch_siz
 
         cleaned_obs = [list(map(float, obs.strip().split())) for obs in observation[0]]
         prediction = [model(cl, target_size=target_size, seasonality=dataset.seasonalities) for cl in cleaned_obs]
-
+        
         preds.extend(prediction)
         true.extend(observation[1])
+        iters += 1
 
     preds = np.array(preds).reshape(-1, target_size).astype(float)
     true = np.array(true).reshape(-1, target_size).astype(float)
