@@ -19,7 +19,7 @@ def set_pad_token_if_missing(tokenizer):
 
 def compute_new_tokens(target_size, example_output, tokenizer):
     example_tokens = tokenizer(example_output, add_special_tokens=False)['input_ids']
-    return target_size * len(example_tokens)
+    return max(20, target_size * len(example_tokens))
 
 
 def extract_numbers(text):
