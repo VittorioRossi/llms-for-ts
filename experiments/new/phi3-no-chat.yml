@@ -14,42 +14,46 @@ experiments:
 #    target_size: 1
 #    window_size: 15
 #    batch_size: 64
-#  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
-#    prompt_name: 'base'
-#    is_chat_model: False
-#    dataset_name: 'ETTh1'
-#    target_size: 48
-#    window_size: 168
-#    batch_size: 8
-#    stride: 8
-#    max_token_mutliplier: 2
-#  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
-#    prompt_name: 'base'
-#    is_chat_model: False
-#    dataset_name: 'ETTh2'
-#    target_size: 48
-#    window_size: 168
-#    batch_size: 8
-#    stride: 8
-#    max_token_mutliplier: 2
-#  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
-#    prompt_name: 'base'
-#    is_chat_model: False
-#    dataset_name: 'ETTm1'
-#    target_size: 48
-#    window_size: 168
-#    batch_size: 8
-#    stride: 8
-#    max_token_mutliplier: 2
-#  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
-#    prompt_name: 'base'
-#    is_chat_model: False
-#    dataset_name: 'ETTm2'
-#    target_size: 48
-#    window_size: 168
-#    batch_size: 8
-#    stride: 8
-#    max_token_mutliplier: 2
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    prompt_name: 'base'
+    is_chat_model: False
+    dataset_name: 'ETTh1'
+    target_size: 48
+    window_size: 168
+    batch_size: 8
+    stride: 8
+    max_token_mutliplier: 2
+    limit_iterations: 55
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    prompt_name: 'base'
+    is_chat_model: False
+    dataset_name: 'ETTh2'
+    target_size: 48
+    window_size: 168
+    batch_size: 8
+    stride: 8
+    max_token_mutliplier: 2
+    limit_iterations: 55
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    prompt_name: 'base'
+    is_chat_model: False
+    dataset_name: 'ETTm1'
+    target_size: 48
+    window_size: 168
+    batch_size: 8
+    stride: 8
+    max_token_mutliplier: 2
+    limit_iterations: 54
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    prompt_name: 'base'
+    is_chat_model: False
+    dataset_name: 'ETTm2'
+    target_size: 48
+    window_size: 168
+    batch_size: 8
+    stride: 8
+    max_token_mutliplier: 2
+    limit_iterations: 55
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     prompt_name: 'base'
     is_chat_model: False
@@ -60,6 +64,7 @@ experiments:
     stride: 1
     limit_rows: 20
     max_token_mutliplier: 2
+    limit_iterations: 32
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     prompt_name: 'base'
     is_chat_model: False
@@ -70,6 +75,7 @@ experiments:
     stride: 1
     limit_rows: 20
     max_token_mutliplier: 2
+    limit_iterations: 57
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     prompt_name: 'base'
     is_chat_model: False
@@ -80,6 +86,7 @@ experiments:
     stride: 1
     limit_rows: 20
     max_token_mutliplier: 2
+    limit_iterations: 80
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     prompt_name: 'base'
     is_chat_model: False
@@ -89,6 +96,7 @@ experiments:
     batch_size: 16
     stride: 1
     limit_rows: 20
+    limit_iterations: 293
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     prompt_name: 'base'
     is_chat_model: False
@@ -99,6 +107,7 @@ experiments:
     stride: 1
     limit_rows: 20
     max_token_mutliplier: 2
+    limit_iterations: 898
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     prompt_name: 'base'
     is_chat_model: False
@@ -109,3 +118,4 @@ experiments:
     stride: 1
     limit_rows: 20
     max_token_mutliplier: 2
+    limit_iterations: 871

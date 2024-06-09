@@ -98,12 +98,21 @@ def run_experiment(model_name,
 
 
     timeout = time.time() + 60*30   # 30 minutes from now
+    iters = 0
+
+    limit_iterations = kwargs.get('limit_iterations', None)
+
     for observation in tqdm(data_generator):
+        if limit_iterations and iters > limit_iterations:
+            logger.info('Limit iterations reached. Stopping the benchmark')
+            break
+
         prediction = model.generate(observation[0])
         preds.extend(prediction)
         true.extend(observation[1])
-
-        if time.time() > timeout:
+        
+        iters += 1
+        if time.time() > timeout and not limit_iterations:
             logger.info('Timeout reached. Stopping the benchmark')
             break
 
@@ -149,6 +158,7 @@ def main(config_path):
         max_token_mutliplier = experiment.get('max_token_mutliplier', 1)
         stride = experiment.get('stride', 1)
         limit_rows = experiment.get('limit_rows', 100)
+        limit_iterations = experiment.get('limit_iterations', None)
 
     
         model_name_clean = model_name.split('/')[1] if '/' in model_name else model_name
@@ -166,7 +176,9 @@ def main(config_path):
                                        limit_rows=limit_rows,
                                        is_chat_model=is_chat_model, 
                                        max_token_mutliplier=max_token_mutliplier,
-                                       stride=stride)
+                                       stride=stride,
+                                       limit_iterations=limit_iterations)
+
                 saving_path = results_dir / (run_name + '.txt')
                 saving_path.parent.mkdir(parents=True, exist_ok=True)
                 with open(saving_path, 'a+') as f:
@@ -184,7 +196,8 @@ def main(config_path):
                                    results_dir=results_dir,
                                    limit_rows=limit_rows,
                                    is_chat_model=is_chat_model,
-                                   max_token_mutliplier=max_token_mutliplier)
+                                   max_token_mutliplier=max_token_mutliplier,
+                                   limit_iterations=limit_iterations)
 
             saving_path = results_dir / (run_name + '.txt')
             saving_path.parent.mkdir(parents=True, exist_ok=True)
