@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 from abc import ABC, abstractmethod
 import os
 import numpy as np
@@ -54,6 +54,45 @@ class LLM(ABC):
     def generate(self, batch: list[str]) -> str:
         pass
 
+class PipelineLLM(LLM):
+    def __init__(self, model: str, example_output="00.0", target_size=1, **kwargs):
+        self.pipeline = self.setup_pipeline(model, example_output, target_size)
+        self.system_message = kwargs.get('system_message', None)
+
+    
+    def setup_pipeline(self, model_name, example_output="00.0", target_size=1):
+        return pipeline(
+            "text-generation",
+            model=model_name,
+            tokenizer=model_name,
+            device=0 if torch.cuda.is_available() else -1
+        )
+
+    def get_generation_params(self, max_length, example_output, target_size, batch_size=1, **kwargs):
+        max_new_tokens = compute_new_tokens(target_size, example_output, self.pipeline.tokenizer)
+        params = {
+            "max_length":max_length, 
+            'no_repeat_ngram_size':2,
+            "return_full_text": False,
+            "do_sample": False,
+            "max_new_tokens": max_new_tokens,
+            "pad_token_id": self.pipeline.tokenizer.pad_token_id,
+            "early_stopping": True,
+            "clean_up_tokenization_spaces": True,
+        }
+        return params
+
+    def add_system_message(self, message, system_message):
+        return [{'role':'user', 'content':system_message}, {'role':'user', 'content':message}]
+
+    def generate(self, message, **kwargs):
+        if self.system_message is not None:
+            message = self.add_system_message(message, self.system_message)
+
+        params = self.get_generation_params(**kwargs)
+
+        return self.pipeline(message, **params)
+
 
 class HuggingFaceLLM(LLM):
     def __init__(self, model: str, example_output="00.0", target_size=1, max_token_mutliplier=1):
@@ -86,25 +125,19 @@ class HuggingFaceLLM(LLM):
         return self.generator(batch)
 
     def load_model(self, model_name, token):
-        model_kwargs = {}
-        if 'bert' in model_name.lower():
-            model_kwargs['is_decoder'] = True
-        
         return AutoModelForCausalLM.from_pretrained(
             model_name,
             cache_dir="models",
             torch_dtype="auto",
             token=token,
-            **model_kwargs
         ).to(self.device)
 
     def load_tokenizer(self, model_name, token):
-        tokenizer_kwargs = {}
-        tokenizer_kwargs['padding_side'] = 'left'
-        return AutoTokenizer.from_pretrained(model_name, token=token, **tokenizer_kwargs)
+        return AutoTokenizer.from_pretrained(model_name, 
+                                             token=token, 
+                                             padding_side='left')
 
     def tokenize_inputs(self, tokenizer, texts, max_length=1024):
-        # Tokenize the batch of texts
         inputs = tokenizer(
             texts,
             return_tensors="pt",
@@ -120,11 +153,15 @@ class HuggingFaceLLM(LLM):
             input_ids=inputs['input_ids'],
             attention_mask=inputs['attention_mask'],
             max_new_tokens=max_new_tokens,
-            pad_token_id=tokenizer.pad_token_id
+            pad_token_id=tokenizer.pad_token_id,
+            no_repeat_ngram_size=2,
+            early_stopping=True,
         )
 
     def decode_outputs(self, tokenizer, texts, outputs, target_size):
-        generated_texts = tokenizer.batch_decode(outputs, skip_special_tokens=True)
+        generated_texts = tokenizer.batch_decode(outputs, 
+                                                 skip_special_tokens=True,
+                                                 clean_up_tokenization_spaces=True)
         torch.cuda.empty_cache()
 
         results = []
@@ -138,7 +175,6 @@ class HuggingFaceLLM(LLM):
                 print(f"Failed to convert prediction '{generated_text}' to float")
 
             results.append(preds)
-
 
         return results
 
@@ -175,7 +211,7 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
     def apply_system_message(self, batch_messages, system_message = "you are a time series forecasting model"):
         return [
             [
-                {'role':'system', 'content':system_message},
+                {'role':'user', 'content':system_message},
                 {'role':'user', 'content':message}
             ]
             for message in batch_messages
@@ -209,7 +245,9 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
         return {key: torch.cat([inputs[key] for inputs in inputs_batch], dim=0).to(self.device) for key in inputs_batch[0]}
 
     def decode_outputs(self, tokenizer, batch_messages, outputs, target_size):
-        generated_texts = tokenizer.batch_decode(outputs, skip_special_tokens=True)
+        generated_texts = tokenizer.batch_decode(outputs, 
+                                                 skip_special_tokens=True,
+                                                 clean_up_tokenization_spaces=True)
         torch.cuda.empty_cache()
 
         results = []

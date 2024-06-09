@@ -125,6 +125,7 @@ class M4Dataset(Dataset):
         self.cache_folder = cache_folder
         self.example_output = "00000.00"
         self.seasonalities = self._compute_seasonality(name)
+        self.max_length = 4000
 
     def _compute_seasonality(self, name):
         if name == 'week':

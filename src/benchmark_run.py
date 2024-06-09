@@ -2,7 +2,7 @@
 
 from evaluation import evaluate
 from features import DATASET_LOADERS
-from models.models import HuggingFaceLLM, HuggingFaceLLMChat
+from models.models import HuggingFaceLLM, HuggingFaceLLMChat, PipelineLLM, set_seed
 from prompt.utils import get_available_templates
 import logging
 from tqdm import tqdm
@@ -12,6 +12,7 @@ from pathlib import Path
 import yaml
 import warnings
 warnings.filterwarnings("ignore")
+set_seed(42)
 
 logging.basicConfig(level=logging.INFO, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -81,7 +82,9 @@ def run_experiment(model_name,
     logger.info('Loading model')
 
         
-    model = load_model(model_name, example_output=dataset.example_output, is_chat_model=is_chat_model, **kwargs)
+    model = PipelineLLM(model_name, example_output=dataset.example_output, target_size=target_size, **kwargs)
+    
+    #load_model(model_name, example_output=dataset.example_output, is_chat_model=is_chat_model, **kwargs)
         
         
 
