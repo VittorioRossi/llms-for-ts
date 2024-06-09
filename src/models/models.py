@@ -6,34 +6,30 @@ import numpy as np
 import logging
 import regex as re
 
-# Basic logger configuration for console output
-logging.basicConfig(level=logging.INFO, 
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-# Create a logger for console and file logging
+# Basic logger configuration
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)  # Set the logger to the lowest level to capture all messages
+
+# Create a console handler for logging to the console
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)  # Set the console handler to INFO level
 
 # Create a file handler for logging to a file
 fh = logging.FileHandler(os.environ.get('LOG_FILE', 'benchmark_run.log'))
-fh.setLevel(logging.DEBUG)
+fh.setLevel(logging.DEBUG)  # Set the file handler to DEBUG level
 
-# Create a formatter and set it for the file handler
+# Create a formatter
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+# Set the formatter for both handlers
+ch.setFormatter(formatter)
 fh.setFormatter(formatter)
 
-# Add the file handler to the logger
+# Add the handlers to the logger
+logger.addHandler(ch)
 logger.addHandler(fh)
 
-# Create a separate logger for file-only logging
-file_logger = logging.getLogger(__name__ + '.file')
-file_logger.setLevel(logging.DEBUG)
 
-# Add the same file handler to the file-only logger
-file_logger.addHandler(fh)
-
-# Remove all handlers from the file-only logger's parent to prevent console output
-for handler in file_logger.parent.handlers:
-    file_logger.parent.removeHandler(handler)
 
 def set_pad_token_if_missing(tokenizer):
     if tokenizer.pad_token is None:
@@ -65,8 +61,8 @@ def clean_pred(pred: str, target_size: int):
     while len(res) < target_size:
         res.append(np.nan)
 
-    file_logger.info(f'Cleaning: {pred.__str__()}')
-    file_logger.info(f'Cleaned: {res.__str__()}')
+    logger.debug(f'Cleaning: {pred.__str__()}')
+    logger.debug(f'Cleaned: {res.__str__()}')
 
     return res
 
