@@ -1,4 +1,4 @@
-results_path: '/content/gdrive/MyDrive/tesi/baseline'
+results_path: '/content/gdrive/MyDrive/tesi/baseline_limit'
 experiments:
   - dataset_name: 'CT'
     target_size: 1
@@ -8,7 +8,6 @@ experiments:
     target_size: 1
     window_size: 15
     batch_size: 64
-experiments:
   - dataset_name: 'ETTh1'
     target_size: 48
     window_size: 168
