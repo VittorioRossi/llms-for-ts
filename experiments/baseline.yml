@@ -33,28 +33,28 @@ experiments:
     window_size: 20
     batch_size: 64
     stride: 1
-    limit_rows: 100
+    limit_rows: 20
   - dataset_name: 'M4-month'
     target_size: 18
     window_size: 60
     batch_size: 64
     stride: 1
-    limit_rows: 100
+    limit_rows: 20
   - dataset_name: 'M4-week'
     target_size: 13
     window_size: 54
     batch_size: 64
     stride: 1
-    limit_rows: 100
+    limit_rows: 20
   - dataset_name: 'M5'
     target_size: 28
     window_size: 28
     batch_size: 64
     stride: 1
-    limit_rows: 100
+    limit_rows: 20
   - dataset_name: 'GWT'
     target_size: 1
     window_size: [28, 56]
     batch_size: 64
     stride: 1
-    limit_rows: 100
+    limit_rows: 20
