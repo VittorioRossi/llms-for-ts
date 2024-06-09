@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 def load_model(model_name, example_output,target_size, is_chat_model=True, **kwargs):
-    max_token_mutliplier = kwargs.get('max_token_mutliplier', 1)
+    max_token_mutliplier = kwargs.get('max_token_mutliplier', 3)
     if is_chat_model:
         try:
             model = HuggingFaceLLMChat(model_name, target_size=target_size, example_output=example_output, max_token_mutliplier=max_token_mutliplier)
