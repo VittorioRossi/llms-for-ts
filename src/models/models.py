@@ -6,17 +6,31 @@ import numpy as np
 import logging
 import regex as re
 
+# Configure the root logger
 logging.basicConfig(level=logging.INFO, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
+# Create a logger for the 'models' module
 logger = logging.getLogger('models')
+logger.setLevel(logging.DEBUG)  # Set the logger to the lowest level to capture all messages
 
+# Remove any existing handlers
 for handler in logger.handlers:
     logger.removeHandler(handler)
 
-logger.addHandler(logging.FileHandler(os.environ.get('LOG_FILE', 'models.log')))
+# Prevent the logger from propagating messages to the root logger
+logger.propagate = False
 
+# Create a file handler for logging to a file
+file_handler = logging.FileHandler(os.environ.get('LOG_FILE', 'models.log'))
+file_handler.setLevel(logging.DEBUG)  # Set the file handler to DEBUG level
 
+# Create a formatter and set it for the file handler
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+
+# Add the file handler to the logger
+logger.addHandler(file_handler)
 def set_pad_token_if_missing(tokenizer):
     if tokenizer.pad_token is None:
         tokenizer.add_special_tokens({'pad_token': '[PAD]'})
@@ -158,7 +172,6 @@ class HuggingFaceLLM(LLM):
             attention_mask=inputs['attention_mask'],
             max_new_tokens=max_new_tokens,
             pad_token_id=tokenizer.pad_token_id,
-            no_repeat_ngram_size=2,
         )
 
     def decode_outputs(self, tokenizer, texts, outputs, target_size):
