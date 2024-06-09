@@ -2,7 +2,8 @@
 
 from evaluation import evaluate
 from features import DATASET_LOADERS
-from models.models import HuggingFaceLLM, HuggingFaceLLMChat, set_seed
+from models.models import HuggingFaceLLM, HuggingFaceLLMChat
+from transformers import set_seed
 from prompt.utils import get_available_templates
 import logging
 from tqdm import tqdm
