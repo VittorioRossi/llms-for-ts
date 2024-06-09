@@ -13,48 +13,57 @@ experiments:
     window_size: 168
     batch_size: 8
     stride: 8
+    max_token_mutliplier: 3
   - dataset_name: 'ETTh2'
     target_size: 48
     window_size: 168
     batch_size: 8
     stride: 8
+    max_token_mutliplier: 3
   - dataset_name: 'ETTm1'
     target_size: 48
     window_size: 168
     batch_size: 8
     stride: 8
+    max_token_mutliplier: 3
   - dataset_name: 'ETTm2'
     target_size: 48
     window_size: 168
     batch_size: 8
     stride: 8
+    max_token_mutliplier: 3
   - dataset_name: 'M4-quarter'
     target_size: 8
     window_size: 20
     batch_size: 64
     stride: 1
     limit_rows: 20
+    max_token_mutliplier: 3
   - dataset_name: 'M4-month'
     target_size: 18
     window_size: 60
     batch_size: 64
     stride: 1
     limit_rows: 20
+    max_token_mutliplier: 3
   - dataset_name: 'M4-week'
     target_size: 13
     window_size: 54
     batch_size: 64
     stride: 1
     limit_rows: 20
+    max_token_mutliplier: 3
   - dataset_name: 'M5'
     target_size: 28
     window_size: 28
     batch_size: 64
     stride: 1
     limit_rows: 20
+    max_token_mutliplier: 3
   - dataset_name: 'GWT'
     target_size: 1
     window_size: [28, 56]
     batch_size: 64
     stride: 1
     limit_rows: 20
+    max_token_mutliplier: 2
