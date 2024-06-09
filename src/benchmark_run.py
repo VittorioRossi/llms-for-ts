@@ -3,7 +3,6 @@
 from evaluation import evaluate
 from features import DATASET_LOADERS
 from models.models import HuggingFaceLLM, HuggingFaceLLMChat
-from transformers import set_seed
 from prompt.utils import get_available_templates
 import logging
 from tqdm import tqdm
@@ -12,43 +11,36 @@ import numpy as np
 from pathlib import Path
 import yaml
 import warnings
-import os
-
-warnings.filterwarnings("ignore")
+from transformers import set_seed
 set_seed(42)
 
-logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
-rootLogger = logging.getLogger()
+warnings.filterwarnings("ignore")
 
-fileHandler = logging.FileHandler(os.environ.get('LOG_FILE', 'benchmark_run.log'))
-fileHandler.setFormatter(logFormatter)
-rootLogger.addHandler(fileHandler)
+logging.basicConfig(level=logging.INFO, 
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-consoleHandler = logging.StreamHandler()
-consoleHandler.setFormatter(logFormatter)
-rootLogger.addHandler(consoleHandler)
+logger = logging.getLogger(__name__)
 
 
-
-def load_model(model_name, example_output, is_chat_model=False, **kwargs):
+def load_model(model_name, example_output, is_chat_model=True, **kwargs):
     max_token_mutliplier = kwargs.get('max_token_mutliplier', 1)
     if is_chat_model:
         try:
             model = HuggingFaceLLMChat(model_name, example_output=example_output, max_token_mutliplier=max_token_mutliplier)
-            consoleHandler.info(f'Chat model {model_name} loaded')
+            logger.info(f'Chat model {model_name} loaded')
             return model
         except Exception as e:
-            consoleHandler.error(f'Model {model_name} not found. Please check the model name and try again.')
-            consoleHandler.error(e)
+            logger.error(f'Model {model_name} not found. Please check the model name and try again.')
+            logger.error(e)
             return
     else:
         try:
             model = HuggingFaceLLM(model_name, example_output=example_output, max_token_mutliplier=max_token_mutliplier)
-            consoleHandler.info(f'Model {model_name} loaded')
+            logger.info(f'Model {model_name} loaded')
             return model
         except Exception as e:
-            consoleHandler.error(f'Model {model_name} not found. Please check the model name and try again.')
-            consoleHandler.error(e)
+            logger.error(f'Model {model_name} not found. Please check the model name and try again.')
+            logger.error(e)
             return
 
 def run_experiment(model_name, 
@@ -75,9 +67,9 @@ def run_experiment(model_name,
         #raise ValueError(f'Prompt {prompt_name} not found. Available prompts are: default, random, template')
         return
 
-    consoleHandler.info(f'Running benchmark - {run_name}')
+    logger.info(f'Running benchmark - {run_name}')
 
-    consoleHandler.info('Loading dataset')
+    logger.info('Loading dataset')
 
     dataset = DATASET_LOADERS[dataset_name]
     data_generator = dataset.process(prompt_name, 
@@ -89,14 +81,14 @@ def run_experiment(model_name,
                                     limit_rows=limit_rows)
 
 
-    consoleHandler.info('Loading model')
+    logger.info('Loading model')
 
         
     model = load_model(model_name, example_output=dataset.example_output, is_chat_model=is_chat_model, **kwargs)
         
         
 
-    consoleHandler.info('Running inference')
+    logger.info('Running inference')
     preds = []
     true = []
 
@@ -105,23 +97,22 @@ def run_experiment(model_name,
         prediction = model.generate(observation[0])
         preds.extend(prediction)
         true.extend(observation[1])
-        fileHandler.debug(f'Prediction: {prediction.__str__()}')
 
 
     preds = np.array(preds).reshape(-1, target_size).astype(float)
     true = np.array(true).reshape(-1, target_size).astype(float)
 
     if preds_path:
-        consoleHandler.info(f'Saving predictions to {preds_path}')
+        logger.info(f'Saving predictions to {preds_path}')
         saving_path = Path(preds_path) / f'{run_name}.npy'
         saving_path.parent.mkdir(parents=True, exist_ok=True)
         np.save(saving_path, preds)
 
-    consoleHandler.info('Evaluating model')
+    logger.info('Evaluating model')
     eval = evaluate(true, preds)
-    consoleHandler.info(eval)
+    logger.info(eval)
 
-    consoleHandler.info(f'End of benchmark run - {run_name}')
+    logger.info(f'End of benchmark run - {run_name}')
 
     return eval
 

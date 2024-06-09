@@ -6,16 +6,15 @@ import numpy as np
 import logging
 import regex as re
 
-logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
-rootLogger = logging.getLogger()
+logging.basicConfig(level=logging.INFO, 
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-fileHandler = logging.FileHandler(os.environ.get('LOG_FILE', 'benchmark_run.log'))
-fileHandler.setFormatter(logFormatter)
-rootLogger.addHandler(fileHandler)
+logger = logging.getLogger('models')
 
-logger = logging.StreamHandler()
-logger.setFormatter(logFormatter)
-rootLogger.addHandler(logger)
+for handler in logger.handlers:
+    logger.removeHandler(handler)
+
+logger.addHandler(logging.FileHandler(os.environ.get('LOG_FILE', 'models.log')))
 
 
 def set_pad_token_if_missing(tokenizer):
@@ -25,7 +24,7 @@ def set_pad_token_if_missing(tokenizer):
 
 def compute_new_tokens(target_size, example_output, tokenizer):
     example_tokens = tokenizer(example_output, add_special_tokens=False)['input_ids']
-    return max(20, target_size * len(example_tokens))
+    return target_size * len(example_tokens)
 
 
 def extract_numbers(text):
@@ -40,7 +39,6 @@ def clean_pred(pred: str, target_size: int):
     
     # Initialize the result list
     res = []
-
     for num in numbers[:target_size]:
         res.append(num)
 
@@ -48,9 +46,7 @@ def clean_pred(pred: str, target_size: int):
     while len(res) < target_size:
         res.append(np.nan)
 
-    fileHandler.debug(f'Cleaning: {pred.__str__()}')
-    fileHandler.debug(f'Cleaned: {res.__str__()}')
-
+    logger.info(f'Cleaned prediction: {res}\n')
     return res
 
 
@@ -162,6 +158,7 @@ class HuggingFaceLLM(LLM):
             attention_mask=inputs['attention_mask'],
             max_new_tokens=max_new_tokens,
             pad_token_id=tokenizer.pad_token_id,
+            no_repeat_ngram_size=2,
         )
 
     def decode_outputs(self, tokenizer, texts, outputs, target_size):
@@ -172,8 +169,9 @@ class HuggingFaceLLM(LLM):
 
         results = []
         for text, generated_text in zip(texts, generated_texts):
-            if text in generated_text:
-                generated_text = generated_text[len(text):]
+
+            generated_text = generated_text[len(text):]
+            logger.info(f'Generated text: {generated_text}')
             
             preds = clean_pred(generated_text, target_size)
             if np.isnan(preds).any():
@@ -259,6 +257,9 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
         for messages, generated_text in zip(batch_messages, generated_texts):
             original_text = ' '.join([msg['content'] for msg in messages])
             generated_text = generated_text[len(original_text):].strip()
+
+            logger.info(f'Generated text: {generated_text}')
+
             preds = clean_pred(generated_text, target_size)
             if np.isnan(preds).any():
                 print(f"Failed to convert prediction '{generated_text}' to float")
