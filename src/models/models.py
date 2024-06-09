@@ -77,7 +77,6 @@ class PipelineLLM(LLM):
             "do_sample": False,
             "max_new_tokens": max_new_tokens,
             "pad_token_id": self.pipeline.tokenizer.pad_token_id,
-            "early_stopping": True,
             "clean_up_tokenization_spaces": True,
         }
         return params
@@ -137,12 +136,12 @@ class HuggingFaceLLM(LLM):
                                              token=token, 
                                              padding_side='left')
 
-    def tokenize_inputs(self, tokenizer, texts, max_length=1024):
+    def tokenize_inputs(self, tokenizer, texts, max_length=4000):
         inputs = tokenizer(
             texts,
             return_tensors="pt",
-            padding=True,
-            truncation='only_first',
+            padding='longest',
+            truncation='longest_first',
             max_length=max_length,
         )
     
@@ -155,7 +154,6 @@ class HuggingFaceLLM(LLM):
             max_new_tokens=max_new_tokens,
             pad_token_id=tokenizer.pad_token_id,
             no_repeat_ngram_size=2,
-            early_stopping=True,
         )
 
     def decode_outputs(self, tokenizer, texts, outputs, target_size):
@@ -217,13 +215,13 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
             for message in batch_messages
         ]
 
-    def tokenize_batch(self, tokenizer, batch_messages, max_length=1024):
+    def tokenize_batch(self, tokenizer, batch_messages, max_length=4000):
         def apply_chat_template(messages):
             return tokenizer(
                 tokenizer.eos_token.join([msg['content'] for msg in messages]),
                 return_tensors="pt",
-                padding=True,
-                truncation='only_first',
+                padding='longest',
+                truncation='longest_first',
                 max_length=max_length
             )
 
