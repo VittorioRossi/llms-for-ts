@@ -179,6 +179,7 @@ def main(config_path):
                                    window_size=window_size,
                                    target_size=target_size,
                                    batch_size=batch_size,
+                                   stride=stride,
                                    chunk_size=chunk_size,
                                    results_dir=results_dir,
                                    limit_rows=limit_rows,
