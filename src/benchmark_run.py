@@ -12,6 +12,7 @@ from pathlib import Path
 import yaml
 import warnings
 from transformers import set_seed
+import time
 set_seed(42)
 
 warnings.filterwarnings("ignore")
@@ -93,10 +94,18 @@ def run_experiment(model_name,
     true = []
 
     # observation is a batch contatinign (X, y) where X has size 64 x window_size and y has size 64 x target_size
+
+
+
+    timeout = time.time() + 60*30   # 30 minutes from now
     for observation in tqdm(data_generator):
         prediction = model.generate(observation[0])
         preds.extend(prediction)
         true.extend(observation[1])
+
+        if time.time() > timeout:
+            logger.info('Timeout reached. Stopping the benchmark')
+            break
 
 
     preds = np.array(preds).reshape(-1, target_size).astype(float)
