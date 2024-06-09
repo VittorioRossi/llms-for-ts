@@ -1,19 +1,19 @@
 results_path: '/content/gdrive/MyDrive/tesi'
 experiments: 
-  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
-    prompt_name: 'base'
-    is_chat_model: False
-    dataset_name: 'CT'
-    target_size: 1
-    window_size: 15
-    batch_size: 64
-  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
-    prompt_name: 'base'
-    is_chat_model: False
-    dataset_name: 'SG'
-    target_size: 1
-    window_size: 15
-    batch_size: 64
+#  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+#    prompt_name: 'base'
+#    is_chat_model: False
+#    dataset_name: 'CT'
+#    target_size: 1
+#    window_size: 15
+#    batch_size: 64
+#  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+#    prompt_name: 'base'
+#    is_chat_model: False
+#    dataset_name: 'SG'
+#    target_size: 1
+#    window_size: 15
+#    batch_size: 64
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     prompt_name: 'base'
     is_chat_model: False
