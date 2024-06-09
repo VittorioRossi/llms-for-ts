@@ -6,29 +6,16 @@ import numpy as np
 import logging
 import regex as re
 
-# Basic logger configuration
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)  # Set the logger to the lowest level to capture all messages
+logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+rootLogger = logging.getLogger()
 
-# Create a console handler for logging to the console
-ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)  # Set the console handler to INFO level
+fileHandler = logging.FileHandler(os.environ.get('LOG_FILE', 'benchmark_run.log'))
+fileHandler.setFormatter(logFormatter)
+rootLogger.addHandler(fileHandler)
 
-# Create a file handler for logging to a file
-fh = logging.FileHandler(os.environ.get('LOG_FILE', 'benchmark_run.log'))
-fh.setLevel(logging.DEBUG)  # Set the file handler to DEBUG level
-
-# Create a formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-# Set the formatter for both handlers
-ch.setFormatter(formatter)
-fh.setFormatter(formatter)
-
-# Add the handlers to the logger
-logger.addHandler(ch)
-logger.addHandler(fh)
-
+logger = logging.StreamHandler()
+logger.setFormatter(logFormatter)
+rootLogger.addHandler(logger)
 
 
 def set_pad_token_if_missing(tokenizer):
@@ -61,8 +48,8 @@ def clean_pred(pred: str, target_size: int):
     while len(res) < target_size:
         res.append(np.nan)
 
-    logger.debug(f'Cleaning: {pred.__str__()}')
-    logger.debug(f'Cleaned: {res.__str__()}')
+    fileHandler.debug(f'Cleaning: {pred.__str__()}')
+    fileHandler.debug(f'Cleaned: {res.__str__()}')
 
     return res
 
@@ -175,7 +162,6 @@ class HuggingFaceLLM(LLM):
             attention_mask=inputs['attention_mask'],
             max_new_tokens=max_new_tokens,
             pad_token_id=tokenizer.pad_token_id,
-            no_repeat_ngram_size=2,
         )
 
     def decode_outputs(self, tokenizer, texts, outputs, target_size):
