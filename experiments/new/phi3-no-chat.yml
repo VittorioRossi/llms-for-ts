@@ -87,7 +87,16 @@ experiments:
     is_chat_model: False
     dataset_name: 'GWT'
     target_size: 1
-    window_size: [28, 56]
+    window_size: 28
+    batch_size: 64
+    stride: 1
+    limit_rows: 20
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    prompt_name: 'base'
+    is_chat_model: False
+    dataset_name: 'GWT'
+    target_size: 1
+    window_size: 56
     batch_size: 64
     stride: 1
     limit_rows: 20
