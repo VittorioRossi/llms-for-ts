@@ -22,11 +22,11 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger(__name__)
 
 
-def load_model(model_name, example_output, is_chat_model=True, **kwargs):
+def load_model(model_name, example_output,target_size, is_chat_model=True, **kwargs):
     max_token_mutliplier = kwargs.get('max_token_mutliplier', 1)
     if is_chat_model:
         try:
-            model = HuggingFaceLLMChat(model_name, example_output=example_output, max_token_mutliplier=max_token_mutliplier)
+            model = HuggingFaceLLMChat(model_name, target_size=target_size, example_output=example_output, max_token_mutliplier=max_token_mutliplier)
             logger.info(f'Chat model {model_name} loaded')
             return model
         except Exception as e:
@@ -35,7 +35,7 @@ def load_model(model_name, example_output, is_chat_model=True, **kwargs):
             return
     else:
         try:
-            model = HuggingFaceLLM(model_name, example_output=example_output, max_token_mutliplier=max_token_mutliplier)
+            model = HuggingFaceLLM(model_name, target_size=target_size, example_output=example_output, max_token_mutliplier=max_token_mutliplier)
             logger.info(f'Model {model_name} loaded')
             return model
         except Exception as e:
@@ -84,7 +84,7 @@ def run_experiment(model_name,
     logger.info('Loading model')
 
         
-    model = load_model(model_name, example_output=dataset.example_output, is_chat_model=is_chat_model, **kwargs)
+    model = load_model(model_name, target_size=target_size, example_output=dataset.example_output, is_chat_model=is_chat_model, **kwargs)
         
         
 

@@ -50,7 +50,7 @@ def extract_numbers(text):
 def clean_pred(pred: str, target_size: int):
     # Extract numbers from the prediction string
     numbers = extract_numbers(pred)
-    
+    logger.info(f'Extracted numbers: {numbers}')
     # Initialize the result list
     res = []
     for num in numbers[:target_size]:
@@ -72,45 +72,6 @@ class LLM(ABC):
     @abstractmethod
     def generate(self, batch: list[str]) -> str:
         pass
-
-class PipelineLLM(LLM):
-    def __init__(self, model: str, example_output="00.0", target_size=1, **kwargs):
-        self.pipeline = self.setup_pipeline(model, example_output, target_size)
-        self.system_message = kwargs.get('system_message', None)
-
-    
-    def setup_pipeline(self, model_name, example_output="00.0", target_size=1):
-        return pipeline(
-            "text-generation",
-            model=model_name,
-            tokenizer=model_name,
-            device=0 if torch.cuda.is_available() else -1
-        )
-
-    def get_generation_params(self, max_length, example_output, target_size, batch_size=1, **kwargs):
-        max_new_tokens = compute_new_tokens(target_size, example_output, self.pipeline.tokenizer)
-        params = {
-            "max_length":max_length, 
-            'no_repeat_ngram_size':2,
-            "return_full_text": False,
-            "do_sample": False,
-            "max_new_tokens": max_new_tokens,
-            "pad_token_id": self.pipeline.tokenizer.pad_token_id,
-            "clean_up_tokenization_spaces": True,
-        }
-        return params
-
-    def add_system_message(self, message, system_message):
-        return [{'role':'user', 'content':system_message}, {'role':'user', 'content':message}]
-
-    def generate(self, message, **kwargs):
-        if self.system_message is not None:
-            message = self.add_system_message(message, self.system_message)
-
-        params = self.get_generation_params(**kwargs)
-
-        return self.pipeline(message, **params)
-
 
 class HuggingFaceLLM(LLM):
     def __init__(self, model: str, example_output="00.0", target_size=1, max_token_mutliplier=1):
@@ -280,3 +241,44 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
             results.append(preds)
 
         return results
+    
+
+
+
+class PipelineLLM(LLM):
+    def __init__(self, model: str, example_output="00.0", target_size=1, **kwargs):
+        self.pipeline = self.setup_pipeline(model, example_output, target_size)
+        self.system_message = kwargs.get('system_message', None)
+
+    
+    def setup_pipeline(self, model_name, example_output="00.0", target_size=1):
+        return pipeline(
+            "text-generation",
+            model=model_name,
+            tokenizer=model_name,
+            device=0 if torch.cuda.is_available() else -1
+        )
+
+    def get_generation_params(self, max_length, example_output, target_size, batch_size=1, **kwargs):
+        max_new_tokens = compute_new_tokens(target_size, example_output, self.pipeline.tokenizer)
+        params = {
+            "max_length":max_length, 
+            'no_repeat_ngram_size':2,
+            "return_full_text": False,
+            "do_sample": False,
+            "max_new_tokens": max_new_tokens,
+            "pad_token_id": self.pipeline.tokenizer.pad_token_id,
+            "clean_up_tokenization_spaces": True,
+        }
+        return params
+
+    def add_system_message(self, message, system_message):
+        return [{'role':'user', 'content':system_message}, {'role':'user', 'content':message}]
+
+    def generate(self, message, **kwargs):
+        if self.system_message is not None:
+            message = self.add_system_message(message, self.system_message)
+
+        params = self.get_generation_params(**kwargs)
+
+        return self.pipeline(message, **params)
