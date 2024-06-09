@@ -22,7 +22,7 @@ experiments:
     window_size: 168
     batch_size: 8
     stride: 8
-    max_token_mutliplier: 5
+    max_token_mutliplier: 2
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     prompt_name: 'base'
     is_chat_model: False
@@ -31,7 +31,7 @@ experiments:
     window_size: 168
     batch_size: 8
     stride: 8
-    max_token_mutliplier: 5
+    max_token_mutliplier: 2
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     prompt_name: 'base'
     is_chat_model: False
@@ -40,7 +40,7 @@ experiments:
     window_size: 168
     batch_size: 8
     stride: 8
-    max_token_mutliplier: 5
+    max_token_mutliplier: 2
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     prompt_name: 'base'
     is_chat_model: False
@@ -49,7 +49,7 @@ experiments:
     window_size: 168
     batch_size: 8
     stride: 8
-    max_token_mutliplier: 5
+    max_token_mutliplier: 2
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     prompt_name: 'base'
     is_chat_model: False
@@ -59,7 +59,7 @@ experiments:
     batch_size: 64
     stride: 1
     limit_rows: 20
-    max_token_mutliplier: 5
+    max_token_mutliplier: 2
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     prompt_name: 'base'
     is_chat_model: False
@@ -69,7 +69,7 @@ experiments:
     batch_size: 64
     stride: 1
     limit_rows: 20
-    max_token_mutliplier: 5
+    max_token_mutliplier: 2
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     prompt_name: 'base'
     is_chat_model: False
@@ -79,7 +79,7 @@ experiments:
     batch_size: 64
     stride: 1
     limit_rows: 20
-    max_token_mutliplier: 5
+    max_token_mutliplier: 2
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     prompt_name: 'base'
     is_chat_model: False
@@ -98,7 +98,7 @@ experiments:
     batch_size: 64
     stride: 1
     limit_rows: 20
-    max_token_mutliplier: 5
+    max_token_mutliplier: 2
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     prompt_name: 'base'
     is_chat_model: False
@@ -108,4 +108,4 @@ experiments:
     batch_size: 64
     stride: 1
     limit_rows: 20
-    max_token_mutliplier: 5
+    max_token_mutliplier: 2
