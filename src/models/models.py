@@ -6,18 +6,34 @@ import numpy as np
 import logging
 import regex as re
 
+# Basic logger configuration for console output
 logging.basicConfig(level=logging.INFO, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-logger = logging.getLogger('models')
+# Create a logger for console and file logging
+logger = logging.getLogger(__name__)
 
+# Create a file handler for logging to a file
 fh = logging.FileHandler(os.environ.get('LOG_FILE', 'benchmark_run.log'))
 fh.setLevel(logging.DEBUG)
+
+# Create a formatter and set it for the file handler
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+
+# Add the file handler to the logger
 logger.addHandler(fh)
 
+# Create a separate logger for file-only logging
 file_logger = logging.getLogger(__name__ + '.file')
 file_logger.setLevel(logging.DEBUG)
+
+# Add the same file handler to the file-only logger
 file_logger.addHandler(fh)
+
+# Remove all handlers from the file-only logger's parent to prevent console output
+for handler in file_logger.parent.handlers:
+    file_logger.parent.removeHandler(handler)
 
 def set_pad_token_if_missing(tokenizer):
     if tokenizer.pad_token is None:

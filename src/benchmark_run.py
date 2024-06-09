@@ -15,20 +15,34 @@ import warnings
 warnings.filterwarnings("ignore")
 set_seed(42)
 
+# Basic logger configuration for console output
 logging.basicConfig(level=logging.INFO, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
+# Create a logger for console and file logging
 logger = logging.getLogger(__name__)
 
-import os
-
+# Create a file handler for logging to a file
 fh = logging.FileHandler(os.environ.get('LOG_FILE', 'benchmark_run.log'))
 fh.setLevel(logging.DEBUG)
+
+# Create a formatter and set it for the file handler
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+
+# Add the file handler to the logger
 logger.addHandler(fh)
 
+# Create a separate logger for file-only logging
 file_logger = logging.getLogger(__name__ + '.file')
 file_logger.setLevel(logging.DEBUG)
+
+# Add the same file handler to the file-only logger
 file_logger.addHandler(fh)
+
+# Remove all handlers from the file-only logger's parent to prevent console output
+for handler in file_logger.parent.handlers:
+    file_logger.parent.removeHandler(handler)
 
 
 
