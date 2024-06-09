@@ -11,6 +11,13 @@ logging.basicConfig(level=logging.INFO,
 
 logger = logging.getLogger('models')
 
+fh = logging.FileHandler(os.environ.get('LOG_FILE', 'benchmark_run.log'))
+fh.setLevel(logging.DEBUG)
+logger.addHandler(fh)
+
+file_logger = logging.getLogger(__name__ + '.file')
+file_logger.setLevel(logging.DEBUG)
+file_logger.addHandler(fh)
 
 def set_pad_token_if_missing(tokenizer):
     if tokenizer.pad_token is None:
@@ -41,6 +48,9 @@ def clean_pred(pred: str, target_size: int):
     # If the number of numbers is less than target_size, append np.nan to the result
     while len(res) < target_size:
         res.append(np.nan)
+
+    file_logger.info(f'\nCleaning: {pred}')
+    file_logger.info(f'Cleaned: {res}\n')
 
     return res
 
@@ -164,7 +174,6 @@ class HuggingFaceLLM(LLM):
 
         results = []
         for text, generated_text in zip(texts, generated_texts):
-
             if text in generated_text:
                 generated_text = generated_text[len(text):]
             

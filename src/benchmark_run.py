@@ -19,6 +19,17 @@ logging.basicConfig(level=logging.INFO,
 
 logger = logging.getLogger(__name__)
 
+import os
+
+fh = logging.FileHandler(os.environ.get('LOG_FILE', 'benchmark_run.log'))
+fh.setLevel(logging.DEBUG)
+logger.addHandler(fh)
+
+file_logger = logging.getLogger(__name__ + '.file')
+file_logger.setLevel(logging.DEBUG)
+file_logger.addHandler(fh)
+
+
 
 def load_model(model_name, example_output, is_chat_model=True, **kwargs):
     max_token_mutliplier = kwargs.get('max_token_mutliplier', 1)
@@ -95,6 +106,7 @@ def run_experiment(model_name,
         prediction = model.generate(observation[0])
         preds.extend(prediction)
         true.extend(observation[1])
+        file_logger.info(f'Prediction: {prediction}')
 
 
     preds = np.array(preds).reshape(-1, target_size).astype(float)
