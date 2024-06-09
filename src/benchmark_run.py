@@ -173,14 +173,14 @@ def main(config_path):
                     f.write(evals.__str__() + '\n')
 
         else:
-            evals = run_experiment(model_name,
-                                   dataset_name,
-                                   prompt_name,
-                                   window_size,
-                                   target_size,
-                                   batch_size,
-                                   chunk_size,
-                                   results_dir,
+            evals = run_experiment(model_name=model_name,
+                                   dataset_name=dataset_name,
+                                   prompt_name=prompt_name,
+                                   window_size=window_size,
+                                   target_size=target_size,
+                                   batch_size=batch_size,
+                                   chunk_size=chunk_size,
+                                   results_dir=results_dir,
                                    limit_rows=limit_rows,
                                    is_chat_model=is_chat_model,
                                    max_token_mutliplier=max_token_mutliplier)
