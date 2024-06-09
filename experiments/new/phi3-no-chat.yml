@@ -1,0 +1,82 @@
+results_path: '/content/gdrive/MyDrive/tesi'
+experiments: 
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    is_chat_model: False
+    dataset_name: 'CT'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    is_chat_model: False
+    dataset_name: 'SG'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    is_chat_model: False
+    dataset_name: 'ETTh1'
+    target_size: 96
+    window_size: 168
+    batch_size: 8
+    stride: 8
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    is_chat_model: False
+    dataset_name: 'ETTh2'
+    target_size: 96
+    window_size: 168
+    batch_size: 8
+    stride: 8
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    is_chat_model: False
+    dataset_name: 'ETTm1'
+    target_size: 96
+    window_size: 168
+    batch_size: 8
+    stride: 8
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    is_chat_model: False
+    dataset_name: 'ETTm2'
+    target_size: 96
+    window_size: 168
+    batch_size: 8
+    stride: 8
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    is_chat_model: False
+    dataset_name: 'M4-quarter'
+    target_size: 8
+    window_size: 20
+    batch_size: 64
+    stride: 1
+    limit_rows: 20
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    is_chat_model: False
+    dataset_name: 'M4-month'
+    target_size: 18
+    window_size: 60
+    batch_size: 64
+    stride: 1
+    limit_rows: 20
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    is_chat_model: False
+    dataset_name: 'M4-week'
+    target_size: 13
+    window_size: 54
+    batch_size: 64
+    stride: 1
+    limit_rows: 20
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    is_chat_model: False
+    dataset_name: 'M5'
+    target_size: 28
+    window_size: 28
+    batch_size: 64
+    stride: 1
+    limit_rows: 20
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    is_chat_model: False
+    dataset_name: 'GWT'
+    target_size: 1
+    window_size: [28, 56]
+    batch_size: 64
+    stride: 1
+    limit_rows: 20
