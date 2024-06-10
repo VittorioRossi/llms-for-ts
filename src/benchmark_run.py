@@ -137,7 +137,7 @@ def main(config_path):
             'skip_special_tokens': experiment.get('skip_special_tokens', True),
         }
 
-        #dataset_name = experiment['dataset_name']
+        dataset_name = experiment['dataset_name']
         #model_name_clean = common_params['model_name'].split('/')[1] if '/' in common_params['model_name'] else common_params['model_name']
         #run_name = f"{model_name_clean}_{dataset_name}_{common_params['prompt_name']}_{common_params['window_size']}_{common_params['target_size']}"
 
