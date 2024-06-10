@@ -1,21 +1,21 @@
 results_path: '/content/gdrive/MyDrive/tesi'
 experiments: 
-  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
-    skip_special_tokens: False
-    prompt_name: 'base_llm_phi3'
-    is_chat_model: False
-    dataset_name: 'CT'
-    target_size: 1
-    window_size: 15
-    batch_size: 64
-  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
-    skip_special_tokens: False
-    prompt_name: 'base_llm_phi3'
-    is_chat_model: False
-    dataset_name: 'SG'
-    target_size: 1
-    window_size: 15
-    batch_size: 64
+#  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+#    skip_special_tokens: False
+#    prompt_name: 'base_llm_phi3'
+#    is_chat_model: False
+#    dataset_name: 'CT'
+#    target_size: 1
+#    window_size: 15
+#    batch_size: 64
+#  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+#    skip_special_tokens: False
+#    prompt_name: 'base_llm_phi3'
+#    is_chat_model: False
+#    dataset_name: 'SG'
+#    target_size: 1
+#    window_size: 15
+#    batch_size: 64
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     skip_special_tokens: False
     prompt_name: 'base_llm_phi3'
@@ -25,7 +25,7 @@ experiments:
     window_size: 168
     batch_size: 8
     stride: 8
-    max_token_mutliplier: 2.5
+    max_token_mutliplier: 4
     limit_iterations: 55
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     skip_special_tokens: False
@@ -36,7 +36,7 @@ experiments:
     window_size: 168
     batch_size: 8
     stride: 8
-    max_token_mutliplier: 2.5
+    max_token_mutliplier: 4
     limit_iterations: 55
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     skip_special_tokens: False
@@ -47,7 +47,7 @@ experiments:
     window_size: 168
     batch_size: 8
     stride: 8
-    max_token_mutliplier: 2.5
+    max_token_mutliplier: 4
     limit_iterations: 54
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     skip_special_tokens: False
@@ -58,7 +58,7 @@ experiments:
     window_size: 168
     batch_size: 8
     stride: 8
-    max_token_mutliplier: 2.5
+    max_token_mutliplier: 4
     limit_iterations: 55
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     skip_special_tokens: False
@@ -70,7 +70,7 @@ experiments:
     batch_size: 16
     stride: 1
     limit_rows: 20
-    max_token_mutliplier: 2.5
+    max_token_mutliplier: 4
     limit_iterations: 32
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     skip_special_tokens: False
@@ -82,7 +82,7 @@ experiments:
     batch_size: 16
     stride: 1
     limit_rows: 20
-    max_token_mutliplier: 2.5
+    max_token_mutliplier: 4
     limit_iterations: 57
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     skip_special_tokens: False
@@ -94,7 +94,7 @@ experiments:
     batch_size: 16
     stride: 1
     limit_rows: 20
-    max_token_mutliplier: 2.5
+    max_token_mutliplier: 4
     limit_iterations: 80
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     skip_special_tokens: False
@@ -117,7 +117,7 @@ experiments:
     batch_size: 16
     stride: 1
     limit_rows: 20
-    max_token_mutliplier: 2.5
+    max_token_mutliplier: 4
     limit_iterations: 898
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
     skip_special_tokens: False
@@ -129,5 +129,5 @@ experiments:
     batch_size: 16
     stride: 1
     limit_rows: 20
-    max_token_mutliplier: 2.5
+    max_token_mutliplier: 4
     limit_iterations: 871
