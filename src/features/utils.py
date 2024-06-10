@@ -94,7 +94,7 @@ def render_series(series: list, prompt_name, **kwargs) -> str:
     """
     prompt: Template = load_template(prompt_name)
 
-    return prompt.render(data=series, **kwargs)
+    return prompt.render(data={'target':series}, **kwargs)
 
 
 def _create_observations_w_ft_and_meta(df: pd.DataFrame, prompt:Template, target: str, ts_features: List[str], metadata: List[str], window_size: int = 24, target_size: int = 1, stride=1) -> List[Observation]:

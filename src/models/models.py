@@ -140,7 +140,7 @@ class HuggingFaceLLM(LLM):
 
     def decode_outputs(self, tokenizer, texts, outputs, target_size):
         generated_texts = tokenizer.batch_decode(outputs, 
-                                                skip_special_tokens=self.skip_special_tokens,
+                                                skip_special_tokens=True,
                                                 clean_up_tokenization_spaces=True)
 
         torch.cuda.empty_cache()
@@ -149,7 +149,10 @@ class HuggingFaceLLM(LLM):
         for text, generated_text in zip(texts, generated_texts):
             
             logger.info(f'Generated text: {repr(generated_text)}')
-            generated_text = generated_text[len(text):]
+            if text.__contains__("<|assistant|>"):
+                generated_text = generated_text.split("<|assistant|>")[-1]
+            else:
+                generated_text = generated_text[len(text):]
             
             preds = clean_pred(generated_text, target_size)
             if np.isnan(preds).any():
