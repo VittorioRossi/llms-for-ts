@@ -88,6 +88,7 @@ class HuggingFaceLLM(LLM):
         max_new_tok = compute_new_tokens(target_size, example_output, tokenizer) * self.max_token_mutliplier
 
         def gen(texts, **kwargs):
+            logger.info(f'Prompts {texts}')
             inputs = self.tokenize_inputs(tokenizer, texts)
             try:
                 outputs = self.generate_outputs(model, tokenizer, inputs, max_new_tok)
