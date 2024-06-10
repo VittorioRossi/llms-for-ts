@@ -74,9 +74,9 @@ class LLM(ABC):
         pass
 
 class HuggingFaceLLM(LLM):
-    def __init__(self, model: str, example_output="00.0", target_size=1, max_token_mutliplier=1, skip_special_tokens=True):
+    def __init__(self, model: str, example_output="00.0", target_size=1, max_token_multiplier=1, skip_special_tokens=True):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.max_token_mutliplier = max_token_mutliplier
+        self.max_token_multiplier = max_token_multiplier
         self.skip_special_tokens = skip_special_tokens
 
         self.generator = self.setup_generator(model, example_output, target_size)
@@ -87,7 +87,7 @@ class HuggingFaceLLM(LLM):
         tokenizer = self.load_tokenizer(model_name, token)
 
         tokenizer = set_pad_token_if_missing(tokenizer)
-        max_new_tok = compute_new_tokens(target_size, example_output, tokenizer) * self.max_token_mutliplier
+        max_new_tok = compute_new_tokens(target_size, example_output, tokenizer) * self.max_token_multiplier
 
         def gen(texts, **kwargs):
             logger.info(f'Prompts {texts}')
@@ -161,9 +161,9 @@ class HuggingFaceLLM(LLM):
 
 
 class HuggingFaceLLMChat(HuggingFaceLLM):
-    def __init__(self, model: str, example_output="00.0", target_size=1, max_token_mutliplier=1, skip_special_tokens=True):
-        super().__init__(model, example_output, target_size, max_token_mutliplier)
-        self.max_token_mutliplier = max_token_mutliplier
+    def __init__(self, model: str, example_output="00.0", target_size=1, max_token_multiplier=1, skip_special_tokens=True):
+        super().__init__(model, example_output, target_size, max_token_multiplier)
+        self.max_token_multiplier = max_token_multiplier
         self.skip_special_tokens = skip_special_tokens
 
     def setup_generator(self, model_name, example_output="00.0", target_size=1):
@@ -172,7 +172,7 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
         tokenizer = self.load_tokenizer(model_name, token)
 
         tokenizer = set_pad_token_if_missing(tokenizer)
-        max_new_tok = compute_new_tokens(target_size, example_output, tokenizer) * self.max_token_mutliplier
+        max_new_tok = compute_new_tokens(target_size, example_output, tokenizer) * self.max_token_multiplier
 
         def gen(batch_messages, **kwargs):
             system_message = kwargs.get('system_message', "you are a time series forecasting model")
