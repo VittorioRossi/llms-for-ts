@@ -46,10 +46,6 @@ def remove_special_tokens(text):
     
     # Replace special tokens with an empty string
     text = re.sub(special_tokens_pattern, '', text)
-    
-    # Remove extra spaces
-    text = re.sub(r'\s+', ' ', text).strip()
-    
     return text
 
 def extract_numbers(text):
@@ -160,7 +156,10 @@ class HuggingFaceLLM(LLM):
         for text, generated_text in zip(texts, generated_texts):
             
             logger.info(f'Generated text: {repr(generated_text)}')
-            generated_text = generated_text[len(remove_special_tokens(text)):]
+            removed_special = remove_special_tokens(text)
+            logger.info(f'Removed special tokens: {removed_special}')
+
+            generated_text = generated_text[len(removed_special):]
             
             preds = clean_pred(generated_text, target_size)
             if np.isnan(preds).any():

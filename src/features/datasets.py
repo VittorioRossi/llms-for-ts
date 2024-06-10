@@ -17,7 +17,7 @@ def cache_dataset(X, y, cache_path, **kwargs):
     
     with open(cache_path, 'a') as f:  # Use 'a' to append to the file
         for xi, yi in zip(X,y):
-            f.write(f'{xi};{yi}\n')  # Write yi as a quoted string
+            f.write(f'{repr(xi)};{repr(yi)}\n')  # Write yi as a quoted string
 
 def load_cached_data(cache_path, batch_size=64):
     with open(cache_path, 'r') as f:
