@@ -1,4 +1,3 @@
-<s><|user|>
-Given the historical time series data, provide the forecasted values for the next {{ target_size }} period. Return just predicted numerical values separated by spaces.
-{% for row in data.target %}{{ row }} {% endfor %}
+<s><|user|>Given the historical time series data, provide the forecasted values for the next {{ target_size }} period. Return just predicted numerical values separated by spaces<|end|>
+<|user|>{% for row in data.target %}{{ row }} {% endfor %}<|end|>
 <|assistant|>

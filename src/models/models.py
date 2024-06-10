@@ -74,9 +74,11 @@ class LLM(ABC):
         pass
 
 class HuggingFaceLLM(LLM):
-    def __init__(self, model: str, example_output="00.0", target_size=1, max_token_mutliplier=1):
+    def __init__(self, model: str, example_output="00.0", target_size=1, max_token_mutliplier=1, skip_special_tokens=True):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.max_token_mutliplier = max_token_mutliplier
+        self.skip_special_tokens = skip_special_tokens
+
         self.generator = self.setup_generator(model, example_output, target_size)
 
     def setup_generator(self, model_name, example_output="00.0", target_size=1):
@@ -136,17 +138,18 @@ class HuggingFaceLLM(LLM):
             pad_token_id=tokenizer.pad_token_id,
         )
 
-    def decode_outputs(self, tokenizer, texts, outputs, target_size):
+    def decode_outputs(self, tokenizer, texts, outputs, target_size,):
         generated_texts = tokenizer.batch_decode(outputs, 
-                                                 skip_special_tokens=True,
-                                                 clean_up_tokenization_spaces=True)
+                                                skip_special_tokens=self.skip_special_tokens,
+                                                clean_up_tokenization_spaces=True)
+
         torch.cuda.empty_cache()
 
         results = []
         for text, generated_text in zip(texts, generated_texts):
-
+            
+            logger.info(f'Generated text: {repr(generated_text)}')
             generated_text = generated_text[len(text):]
-            logger.info(f'Generated text: {generated_text}')
             
             preds = clean_pred(generated_text, target_size)
             if np.isnan(preds).any():
@@ -158,9 +161,10 @@ class HuggingFaceLLM(LLM):
 
 
 class HuggingFaceLLMChat(HuggingFaceLLM):
-    def __init__(self, model: str, example_output="00.0", target_size=1, max_token_mutliplier=1):
+    def __init__(self, model: str, example_output="00.0", target_size=1, max_token_mutliplier=1, skip_special_tokens=True):
         super().__init__(model, example_output, target_size, max_token_mutliplier)
         self.max_token_mutliplier = max_token_mutliplier
+        self.skip_special_tokens = skip_special_tokens
 
     def setup_generator(self, model_name, example_output="00.0", target_size=1):
         token = os.environ.get("HUGGINGFACE_TOKEN")
@@ -224,7 +228,7 @@ class HuggingFaceLLMChat(HuggingFaceLLM):
 
     def decode_outputs(self, tokenizer, batch_messages, outputs, target_size):
         generated_texts = tokenizer.batch_decode(outputs, 
-                                                 skip_special_tokens=True,
+                                                 skip_special_tokens=self.skip_special_tokens,
                                                  clean_up_tokenization_spaces=True)
         torch.cuda.empty_cache()
 
