@@ -40,6 +40,17 @@ def compute_new_tokens(target_size, example_output, tokenizer):
     example_tokens = tokenizer(example_output, add_special_tokens=False)['input_ids']
     return target_size * len(example_tokens)
 
+def remove_special_tokens(text):
+    # Regular expression pattern for special tokens
+    special_tokens_pattern = r'<s>|<\/s>|<\|assistant\|>|<\|user\|>|<\|end\|>\[PAD\]'
+    
+    # Replace special tokens with an empty string
+    text = re.sub(special_tokens_pattern, '', text)
+    
+    # Remove extra spaces
+    text = re.sub(r'\s+', ' ', text).strip()
+    
+    return text
 
 def extract_numbers(text):
     # Find all sequences of digits with optional decimal points in the text
@@ -149,10 +160,7 @@ class HuggingFaceLLM(LLM):
         for text, generated_text in zip(texts, generated_texts):
             
             logger.info(f'Generated text: {repr(generated_text)}')
-            if text.__contains__("<|assistant|>"):
-                generated_text = generated_text.split("<|assistant|>")[-1]
-            else:
-                generated_text = generated_text[len(text):]
+            generated_text = generated_text[len(remove_special_tokens(text)):]
             
             preds = clean_pred(generated_text, target_size)
             if np.isnan(preds).any():
