@@ -1,20 +1,23 @@
 results_path: '/content/gdrive/MyDrive/tesi'
 experiments: 
-#  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
-#    prompt_name: 'base_llm_phi3'
-#    is_chat_model: False
-#    dataset_name: 'CT'
-#    target_size: 1
-#    window_size: 15
-#    batch_size: 64
-#  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
-#    prompt_name: 'base_llm_phi3'
-#    is_chat_model: False
-#    dataset_name: 'SG'
-#    target_size: 1
-#    window_size: 15
-#    batch_size: 64
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    skip_special_tokens: False
+    prompt_name: 'base_llm_phi3'
+    is_chat_model: False
+    dataset_name: 'CT'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    skip_special_tokens: False
+    prompt_name: 'base_llm_phi3'
+    is_chat_model: False
+    dataset_name: 'SG'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
+  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    skip_special_tokens: False
     prompt_name: 'base_llm_phi3'
     is_chat_model: False
     dataset_name: 'ETTh1'
@@ -25,6 +28,7 @@ experiments:
     max_token_mutliplier: 2.5
     limit_iterations: 55
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    skip_special_tokens: False
     prompt_name: 'base_llm_phi3'
     is_chat_model: False
     dataset_name: 'ETTh2'
@@ -35,6 +39,7 @@ experiments:
     max_token_mutliplier: 2.5
     limit_iterations: 55
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    skip_special_tokens: False
     prompt_name: 'base_llm_phi3'
     is_chat_model: False
     dataset_name: 'ETTm1'
@@ -45,6 +50,7 @@ experiments:
     max_token_mutliplier: 2.5
     limit_iterations: 54
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    skip_special_tokens: False
     prompt_name: 'base_llm_phi3'
     is_chat_model: False
     dataset_name: 'ETTm2'
@@ -55,6 +61,7 @@ experiments:
     max_token_mutliplier: 2.5
     limit_iterations: 55
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    skip_special_tokens: False
     prompt_name: 'base_llm_phi3'
     is_chat_model: False
     dataset_name: 'M4-quarter'
@@ -66,6 +73,7 @@ experiments:
     max_token_mutliplier: 2.5
     limit_iterations: 32
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    skip_special_tokens: False
     prompt_name: 'base_llm_phi3'
     is_chat_model: False
     dataset_name: 'M4-month'
@@ -77,6 +85,7 @@ experiments:
     max_token_mutliplier: 2.5
     limit_iterations: 57
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    skip_special_tokens: False
     prompt_name: 'base_llm_phi3'
     is_chat_model: False
     dataset_name: 'M4-week'
@@ -88,6 +97,7 @@ experiments:
     max_token_mutliplier: 2.5
     limit_iterations: 80
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    skip_special_tokens: False
     prompt_name: 'base_llm_phi3'
     is_chat_model: False
     dataset_name: 'M5'
@@ -98,6 +108,7 @@ experiments:
     limit_rows: 20
     limit_iterations: 293
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    skip_special_tokens: False
     prompt_name: 'base_llm_phi3'
     is_chat_model: False
     dataset_name: 'GWT'
@@ -109,6 +120,7 @@ experiments:
     max_token_mutliplier: 2.5
     limit_iterations: 898
   - model_name: 'microsoft/Phi-3-mini-4k-instruct'
+    skip_special_tokens: False
     prompt_name: 'base_llm_phi3'
     is_chat_model: False
     dataset_name: 'GWT'
