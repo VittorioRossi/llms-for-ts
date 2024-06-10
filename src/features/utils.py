@@ -115,7 +115,7 @@ def _create_observations_w_ft_and_meta(df: pd.DataFrame, prompt:Template, target
             continue
 
         X = {ft_name: df[ft_name].iloc[i:i + window_size].values for ft_name in ts_features}
-        X_fin.append(prompt.render(data=X, metadata=mt))
+        X_fin.append(prompt.render(data=X, metadata=mt, target_size=target_size))
         y_fin.append(list(np.array(y, dtype=float).flatten()))
     
     return X_fin, y_fin
