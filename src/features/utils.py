@@ -81,6 +81,22 @@ class Observation(BaseModel):
         """
         return prompt.render(data=self.X, metadata=self.metadata)
 
+def render_series(series: list, prompt_name, **kwargs) -> str:
+    """
+    Render a list of time series values using the prompt.
+
+    Args:
+        series (list): The list of time series values.
+        prompt (Template): The prompt to use to render the time series values.
+
+    Returns:
+        str: The rendered time series values.
+    """
+    prompt: Template = load_template(prompt_name)
+
+    return prompt.render(data=series, **kwargs)
+
+
 def _create_observations_w_ft_and_meta(df: pd.DataFrame, prompt:Template, target: str, ts_features: List[str], metadata: List[str], window_size: int = 24, target_size: int = 1, stride=1) -> List[Observation]:
     """
     Create an observation object with time series features.

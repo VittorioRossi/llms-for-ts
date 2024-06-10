@@ -37,8 +37,6 @@ def load_dataset_file(dataset_name, **kwargs):
     ...
 
 
-
-
 class Dataset(ABC):
     @abstractmethod
     def process(self, prompt_name):
@@ -58,7 +56,7 @@ class CTDataset(Dataset):
 
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines()
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines()
-        X = [x.replace(',', '') for x in X]
+        X = [utils.render_series(x.replace(',', '').split(), prompt_name, **kwargs) for x in X]
         cache_dataset(X, y, cache_path, **kwargs)
         batches = utils.create_batches(X, y, batch_size)
         return batches # this is a generator
@@ -77,7 +75,7 @@ class SGDataset(Dataset):
 
         X = open(self.path + '/minimal/val_x_prompt.txt', 'r').read().splitlines()
         y = open(self.path + '/minimal/val_y_prompt.txt', 'r').read().splitlines()
-        X = [x.replace(',', '') for x in X]
+        X = [utils.render_series(x.replace(',', '').split(), prompt_name, **kwargs) for x in X]
         cache_dataset(X, y, cache_path, prompt_name=prompt_name, **kwargs)
         batches = utils.create_batches(X, y, batch_size)
         return batches # this is a generator
