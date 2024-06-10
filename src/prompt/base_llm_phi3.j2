@@ -1,0 +1,4 @@
+<s><|user|>
+Given the historical time series data, provide the forecasted values for the next {{ target_size }} period.
+{% for row in data.target %}{{ row }} {% endfor %}
+<|assistant|>
