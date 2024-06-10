@@ -42,7 +42,7 @@ def compute_new_tokens(target_size, example_output, tokenizer):
 
 def remove_special_tokens(text):
     # Regular expression pattern for special tokens
-    special_tokens_pattern = r'<s>|<\/s>|<\|assistant\|>|<\|user\|>|<\|end\|>\[PAD\]'
+    special_tokens_pattern = r'<s>|<\/s>|<\|assistant\|>|<\|user\|>|<\|end\|>|\[PAD\]'
     
     # Replace special tokens with an empty string
     text = re.sub(special_tokens_pattern, '', text)
