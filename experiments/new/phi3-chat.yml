@@ -1,4 +1,4 @@
-results_path: '/content/gdrive/MyDrive/tesi'
+results_path: '/home/vittorio_rossi2/drive'
 experiments: 
 #  - model_name: 'microsoft/Phi-3-mini-4k-instruct'
 #    skip_special_tokens: False
