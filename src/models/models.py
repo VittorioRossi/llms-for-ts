@@ -119,13 +119,14 @@ class HuggingFaceLLM(LLM):
             cache_dir="models",
             torch_dtype="auto",
             token=token,
-            trust_remote_token=True
+            trust_remote_code=True
         ).to(self.device)
 
     def load_tokenizer(self, model_name, token):
         return AutoTokenizer.from_pretrained(model_name, 
                                              token=token, 
-                                             padding_side='left')
+                                             padding_side='left',
+                                             trust_remote_code=True)
 
     def tokenize_inputs(self, tokenizer, texts, max_length=4000):
         inputs = tokenizer(
