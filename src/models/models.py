@@ -119,6 +119,7 @@ class HuggingFaceLLM(LLM):
             cache_dir="models",
             torch_dtype="auto",
             token=token,
+            trust_remote_token=True
         ).to(self.device)
 
     def load_tokenizer(self, model_name, token):
