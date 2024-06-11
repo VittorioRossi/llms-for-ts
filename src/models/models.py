@@ -81,7 +81,7 @@ class LLM(ABC):
         pass
 
 class HuggingFaceLLM(LLM):
-    def __init__(self, model: str, example_output="00.0", target_size=1, max_token_multiplier=1, skip_special_tokens=True):
+    def __init__(self, model: str, max_token_multiplier, example_output="00.0", target_size=1, skip_special_tokens=True):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.skip_special_tokens = skip_special_tokens
 
@@ -98,7 +98,7 @@ class HuggingFaceLLM(LLM):
         logger.info(f'Max new tokens: {max_new_tok}, max token multiplier: {max_token_multiplier}')
         def gen(texts, **kwargs):
             logger.info(f'Prompts {texts}')
-            inputs = self.tokenize_inputs(tokenizer, texts)
+            inputs = self.tokenize_inputs(tokenizer, texts).to(self.device)
             try:
                 outputs = self.generate_outputs(model, tokenizer, inputs, max_new_tok)
             except Exception as e:
@@ -127,13 +127,13 @@ class HuggingFaceLLM(LLM):
                                              padding_side='left')
 
     def tokenize_inputs(self, tokenizer, texts, max_length=4000):
-        inputs = tokenizer.batch_encode_plus(
+        inputs = tokenizer(
             texts,
             return_tensors="pt",
             padding='longest',
             truncation='longest_first',
             max_length=max_length,
-        ).to(self.device)
+        )
     
         return inputs
 

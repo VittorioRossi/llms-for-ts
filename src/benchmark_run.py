@@ -25,8 +25,7 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def load_model(model_name, example_output, target_size, is_chat_model=True, **kwargs):
-    max_token_multiplier = kwargs.get('max_token_multiplier', 10)
+def load_model(model_name, example_output, target_size, is_chat_model=True,max_token_multiplier=1, **kwargs):
     try:
         model_cls = HuggingFaceLLMChat if is_chat_model else HuggingFaceLLM
         model = model_cls(model_name, 
@@ -51,7 +50,7 @@ def save_results(results_dir, run_name, eval_result, preds):
     with open(saving_path, 'a+') as f:
         f.write(str(eval_result) + '\n')
 
-def run_experiment(model_name, dataset_name, prompt_name, window_size, target_size, stride, batch_size=64, chunk_size=10, limit_rows=100, results_dir=None, is_chat_model=False, **kwargs):
+def run_experiment(model_name, dataset_name, prompt_name, window_size, target_size, stride, batch_size=64, chunk_size=10, limit_rows=100, results_dir=None, is_chat_model=False,max_token_multiplier=1, **kwargs):
     model_name_clean = model_name.split('/')[1] if '/' in model_name else model_name
     run_name = f'{model_name_clean}_{dataset_name}_{prompt_name}_{window_size}_{target_size}_{stride}'
 
@@ -74,6 +73,7 @@ def run_experiment(model_name, dataset_name, prompt_name, window_size, target_si
     model = load_model(model_name, 
                        target_size=target_size, 
                        example_output=dataset.example_output, 
+                       max_token_multiplier=max_token_multiplier,
                        is_chat_model=is_chat_model, **kwargs)
 
     if not model:
