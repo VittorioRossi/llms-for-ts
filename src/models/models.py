@@ -95,7 +95,7 @@ class HuggingFaceLLM(LLM):
 
         tokenizer = set_pad_token_if_missing(tokenizer)
         max_new_tok = compute_new_tokens(target_size, example_output, tokenizer) * self.max_token_multiplier
-
+        logger.info(f'Max new tokens: {max_new_tok}')
         def gen(texts, **kwargs):
             logger.info(f'Prompts {texts}')
             inputs = self.tokenize_inputs(tokenizer, texts)
@@ -133,9 +133,9 @@ class HuggingFaceLLM(LLM):
             padding='longest',
             truncation='longest_first',
             max_length=max_length,
-        )
+        ).to(self.device)
     
-        return {k: v.to(self.device) for k, v in inputs.items()}
+        return inputs
 
     def generate_outputs(self, model, tokenizer, inputs, max_new_tokens):
         return model.generate(

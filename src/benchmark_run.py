@@ -26,7 +26,7 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger(__name__)
 
 def load_model(model_name, example_output, target_size, is_chat_model=True, **kwargs):
-    max_token_multiplier = kwargs.get('max_token_multiplier', 3)
+    max_token_multiplier = kwargs.get('max_token_multiplier', 10)
     try:
         model_cls = HuggingFaceLLMChat if is_chat_model else HuggingFaceLLM
         model = model_cls(model_name, 
