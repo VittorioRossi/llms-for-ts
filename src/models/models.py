@@ -83,19 +83,19 @@ class LLM(ABC):
 class HuggingFaceLLM(LLM):
     def __init__(self, model: str, example_output="00.0", target_size=1, max_token_multiplier=1, skip_special_tokens=True):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.max_token_multiplier = max_token_multiplier
         self.skip_special_tokens = skip_special_tokens
 
-        self.generator = self.setup_generator(model, example_output, target_size)
+        self.generator = self.setup_generator(model, example_output, target_size, max_token_multiplier)
 
-    def setup_generator(self, model_name, example_output="00.0", target_size=1):
+    def setup_generator(self, model_name, example_output="00.0", target_size=1, max_token_multiplier=1):
         token = os.environ.get("HUGGINGFACE_TOKEN")
         model = self.load_model(model_name, token)
         tokenizer = self.load_tokenizer(model_name, token)
 
         tokenizer = set_pad_token_if_missing(tokenizer)
-        max_new_tok = compute_new_tokens(target_size, example_output, tokenizer) * self.max_token_multiplier
-        logger.info(f'Max new tokens: {max_new_tok}')
+        max_new_tok = compute_new_tokens(target_size, example_output, tokenizer) * max_token_multiplier
+
+        logger.info(f'Max new tokens: {max_new_tok}, max token multiplier: {max_token_multiplier}')
         def gen(texts, **kwargs):
             logger.info(f'Prompts {texts}')
             inputs = self.tokenize_inputs(tokenizer, texts)
@@ -127,7 +127,7 @@ class HuggingFaceLLM(LLM):
                                              padding_side='left')
 
     def tokenize_inputs(self, tokenizer, texts, max_length=4000):
-        inputs = tokenizer(
+        inputs = tokenizer.batch_encode_plus(
             texts,
             return_tensors="pt",
             padding='longest',
