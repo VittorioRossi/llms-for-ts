@@ -1,0 +1,18 @@
+results_path: '/content/drive'
+experiments: 
+  - model_name: 'meta-llama/Meta-Llama-3-8B'
+    prompt_name: 'base_llm_phi3'
+    is_chat_model: False
+    dataset_name: 'CT'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
+    max_token_multiplier: 2
+  - model_name: 'meta-llama/Meta-Llama-3-8B'
+    prompt_name: 'base_llm_phi3'
+    is_chat_model: False
+    dataset_name: 'SG'
+    target_size: 1
+    window_size: 15
+    batch_size: 64
+    max_token_multiplier: 4
